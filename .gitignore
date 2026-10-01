@@ -9,7 +9,7 @@ __pycache__/
 *.egg-info/
 .venv/
 # configuração local da máquina (caminhos do python/repo)
-adapters/revit_pyrevit/config.json
+config.json
 # arquivos do Revit
 *.rvt
 *.rfa

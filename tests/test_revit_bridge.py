@@ -153,7 +153,7 @@ def test_adapter_update_by_diff(casa, monkeypatch):
     rev.DB = DB
     monkeypatch.setitem(sys.modules, "Autodesk", types.ModuleType("Autodesk"))
     monkeypatch.setitem(sys.modules, "Autodesk.Revit", rev)
-    sys.path.insert(0, str(ROOT / "adapters/revit_pyrevit/Vigora.extension/lib"))
+    sys.path.insert(0, str(ROOT / "lib"))
     import importlib
     vr = importlib.import_module("vigora_revit")
     monkeypatch.setattr(vr, "_solido", lambda s: object())

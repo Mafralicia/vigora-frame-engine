@@ -272,34 +272,115 @@ def salvar_config(doc, cfg):
 
 
 # ------------------------------------------------------------------ motor (CPython externo)
-def carregar_instalacao():
-    here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    with io.open(os.path.join(os.path.dirname(here), "config.json"), encoding="utf-8") as f:
-        return json.load(f)
+# A raiz do repositório É a extensão (Vigora.extension): Vigora.tab/, lib/ e o motor em src/.
+EXT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DEPS_IMPORT = "import pydantic, yaml, shapely, openpyxl, matplotlib, reportlab, ezdxf, qrcode, typer"
+CREATE_NO_WINDOW = 0x08000000
+
+
+def _run(cmd, env=None, timeout=None):
+    import subprocess
+    kw = {"stdout": subprocess.PIPE, "stderr": subprocess.STDOUT, "cwd": EXT_ROOT}
+    if os.name == "nt":
+        kw["creationflags"] = CREATE_NO_WINDOW
+    if env:
+        kw["env"] = env
+    try:
+        p = subprocess.Popen(cmd, **kw)
+        out, _ = p.communicate()
+        return p.returncode, out
+    except Exception as ex:
+        return -1, str(ex)
+
+
+def _env():
+    env = dict(os.environ)
+    env["PYTHONPATH"] = os.path.join(EXT_ROOT, "src")
+    env["PYTHONIOENCODING"] = "utf-8"
+    return env
+
+
+def _python_ok(cmd):
+    code, out = _run(cmd + ["-c", "import sys; print(sys.version_info[:2] >= (3, 11))"])
+    return code == 0 and b"True" in (out if isinstance(out, bytes) else out.encode("utf-8", "ignore"))
+
+
+def _candidatos_python():
+    import glob
+    cands = []
+    cfg = _ler_instalacao()
+    if cfg.get("python"):
+        cands.append(cfg["python"] if isinstance(cfg["python"], list) else [cfg["python"]])
+    for v in ("-3.13", "-3.12", "-3.11", "-3"):
+        cands.append(["py", v])
+    cands.append(["python"])
+    roots = [os.environ.get("LOCALAPPDATA", ""), os.environ.get("ProgramFiles", ""), "C:\\"]
+    for r in roots:
+        for pat in ("Programs\\Python\\Python3*\\python.exe", "Python3*\\python.exe"):
+            for exe in sorted(glob.glob(os.path.join(r, pat)), reverse=True):
+                cands.append([exe])
+    return cands
+
+
+def _ler_instalacao():
+    p = os.path.join(EXT_ROOT, "config.json")
+    if os.path.exists(p):
+        try:
+            with io.open(p, encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
+
+
+def python_cmd():
+    """Comando do Python 3.11+ (lista). Procura uma vez e guarda em config.json (fora do Git)."""
+    for c in _candidatos_python():
+        if _python_ok(c):
+            cfg = _ler_instalacao()
+            if cfg.get("python") != c:
+                cfg["python"] = c
+                try:
+                    with io.open(os.path.join(EXT_ROOT, "config.json"), "w", encoding="utf-8") as f:
+                        f.write(json.dumps(cfg, ensure_ascii=False, indent=1))
+                except Exception:
+                    pass
+            return c
+    return None
+
+
+def dependencias_ok(cmd):
+    code, _ = _run(cmd + ["-c", DEPS_IMPORT], env=_env())
+    return code == 0
+
+
+def instalar_dependencias(cmd):
+    """pip install --user das bibliotecas do motor (requirements.txt da própria extensão)."""
+    req = os.path.join(EXT_ROOT, "requirements.txt")
+    return _run(cmd + ["-m", "pip", "install", "--user", "--disable-pip-version-check", "-r", req], env=_env())
 
 
 def rodar_motor(doc, verificar=False):
     """Extrai, grava raw.json e roda o motor. Retorna (código, verificação, pasta, texto da saída)."""
-    import subprocess
-    inst = carregar_instalacao()
+    py = python_cmd()
+    if py is None:
+        return -1, None, pasta_saida(doc), "Python 3.11+ não encontrado"
     pasta = pasta_saida(doc)
     if not os.path.isdir(pasta):
         os.makedirs(pasta)
     rawp = os.path.join(pasta, "raw.json")
     with io.open(rawp, "w", encoding="utf-8") as f:
         f.write(json.dumps(extrair_bruto(doc), ensure_ascii=False))
-    cmd = [inst["python"], "-m", "vigora_frame.cli", "revit", rawp, "--out", pasta]
+    cmd = py + ["-m", "vigora_frame.cli", "revit", rawp, "--out", pasta]
     cfgp = caminho_config(doc)
     if cfgp and os.path.exists(cfgp):
         cmd += ["--config", cfgp]
     if verificar:
         cmd.append("--verificar")
-    env = dict(os.environ)
-    env["PYTHONPATH"] = os.path.join(inst["repo"], "src")
-    p = subprocess.Popen(cmd, cwd=inst["repo"], env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    out, _ = p.communicate()
-    dados = ler_verificacao(pasta)
-    return p.returncode, dados, pasta, out
+    code, out = _run(cmd, env=_env())
+    if isinstance(out, bytes):
+        out = out.decode("utf-8", "ignore")
+    return code, ler_verificacao(pasta), pasta, out
 
 
 def ler_verificacao(pasta):

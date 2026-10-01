@@ -1,0 +1,9 @@
+pydantic>=2
+pyyaml
+shapely>=2
+openpyxl
+matplotlib
+reportlab
+ezdxf
+qrcode
+typer

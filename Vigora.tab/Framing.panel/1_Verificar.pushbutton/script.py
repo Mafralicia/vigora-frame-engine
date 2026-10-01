@@ -7,6 +7,8 @@ import vigora_revit as vr
 import vigora_ui as ui
 
 doc, uidoc = revit.doc, revit.uidoc
+if not ui.preparar_motor():
+    raise SystemExit
 if not doc.PathName:
     forms.alert(u"Salve o modelo antes.", exitscript=True)
 with forms.ProgressBar(title=u"Vigora: verificando o modelo...", indeterminate=True):

@@ -4,8 +4,11 @@ __title__ = "Pranchas"
 import os
 from pyrevit import revit, forms
 import vigora_revit as vr
+import vigora_ui as ui
 
 doc = revit.doc
+if not ui.preparar_motor():
+    raise SystemExit
 cfg = vr.ler_config(doc)
 fmt = forms.CommandSwitchWindow.show([u"A1", u"A0"], message=u"Formato das pranchas")
 if not fmt:

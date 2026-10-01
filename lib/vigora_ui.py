@@ -102,3 +102,27 @@ class JanelaConfig(forms.WPFWindow):
 
     def cancelar(self, sender, args):
         self.Close()
+
+
+def preparar_motor():
+    """Garante Python 3.11+ e as bibliotecas do motor. Retorna True se pode rodar."""
+    py = vr.python_cmd()
+    if py is None:
+        forms.alert(u"O motor da Vigora precisa do Python 3.11 ou mais novo (uma vez por computador).\n\n"
+                    u"Instale em python.org (marque 'Add python.exe to PATH') e clique de novo.",
+                    title=u"Vigora — Python não encontrado")
+        return False
+    if vr.dependencias_ok(py):
+        return True
+    if not forms.alert(u"Primeiro uso neste computador: faltam bibliotecas do motor (pydantic, shapely, "
+                       u"matplotlib...).\n\nInstalar agora? Leva 1 a 3 minutos.", yes=True, no=True,
+                       title=u"Vigora — preparar o motor"):
+        return False
+    with forms.ProgressBar(title=u"Vigora: instalando bibliotecas do motor...", indeterminate=True):
+        code, out = vr.instalar_dependencias(py)
+    if vr.dependencias_ok(py):
+        forms.toast(u"Motor pronto", title=u"Vigora", appid=u"Vigora")
+        return True
+    txt = out.decode("utf-8", "ignore") if isinstance(out, bytes) else (out or u"")
+    forms.alert(u"Não foi possível instalar as bibliotecas. Detalhes:\n\n" + txt[-1500:], title=u"Vigora")
+    return False

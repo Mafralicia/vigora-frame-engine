@@ -1,18 +1,25 @@
 # Plugin Vigora no Revit — instalação
 
 Versões: **Revit 2024, 2025 e 2026** · **pyRevit 5.x** · **Python 3.11+** (o motor roda fora do Revit).
+A raiz deste repositório **é a extensão pyRevit**: clonou na pasta de extensões → *Reload* → aba **Vigora**.
+
+## Instalação (uma vez por computador)
 
 1. Instale o **Python 3.12** (python.org) marcando *Add python.exe to PATH*.
-2. Instale o **pyRevit 5** (github.com/pyrevitlabs/pyRevit/releases) e abra o Revit uma vez.
-3. Clone o repositório: `git clone https://github.com/SEU_USUARIO/vigora-frame-engine C:\vigora-frame-engine`
-   (ou copie a pasta para `C:\vigora-frame-engine`, sem acento no caminho).
-4. No PowerShell, dentro da pasta: `powershell -ExecutionPolicy Bypass -File adapters\revit_pyrevit\instalar.ps1`
-   — instala as dependências, registra a extensão e grava o `config.json` com os caminhos.
-5. Abra o Revit: aparece a aba **Vigora** (se não aparecer: aba pyRevit → *Reload*).
+2. Instale o **pyRevit 5** e o **Git** (git-scm.com).
+3. No PowerShell:
+   ```
+   git clone https://github.com/Mafralicia/vigora-frame-engine.git "$env:APPDATA\pyRevit\Extensions\Vigora.extension"
+   ```
+   (repositório privado: o Git abre o navegador para você autorizar na primeira vez)
+4. No Revit: aba **pyRevit → Reload**. Aparece a aba **Vigora**.
+5. No primeiro clique em *Verificar* ou *Gerar*, o plugin encontra o Python sozinho e, se faltar alguma
+   biblioteca do motor, pergunta e instala (1–3 min). Alternativa: rodar `instalar.ps1` da pasta clonada.
 
-Instalação manual (sem o script): `pip install -e C:\vigora-frame-engine`; pyRevit → Settings →
-*Custom Extension Directories* → adicionar `C:\vigora-frame-engine\adapters\revit_pyrevit`; editar
-`adapters\revit_pyrevit\config.json` com o caminho do `python.exe` e do repositório.
+**Atualizar:** `git -C "$env:APPDATA\pyRevit\Extensions\Vigora.extension" pull` e *Reload* no pyRevit.
+
+**Não use** o gerenciador de extensões do pyRevit (*Install custom extension*) com o repositório privado:
+ele não tem como autenticar e falha com "could not decrypt tls message". O `git clone` acima resolve.
 
 ## A aba Vigora
 
@@ -31,11 +38,9 @@ Instalação manual (sem o script): `pip install -e C:\vigora-frame-engine`; pyR
 | Saídas | **Abrir saídas** | pasta `<modelo>_vigora` ao lado do .rvt |
 
 Nada precisa ser selecionado para Verificar/Gerar: vale para o **projeto inteiro**.
-As escolhas ficam em `<modelo>.vigora.json` ao lado do .rvt (pode ir para o controle de versão junto).
+As escolhas ficam em `<modelo>.vigora.json` ao lado do .rvt.
 
-## Primeiro teste (pontos a confirmar no Revit real)
-
-- Telhado: o valor de `SlopeAngle` da borda é lido como tangente (subida/percurso). Confirmar a inclinação
-  que aparece na verificação; se vier errada, avisar (1 linha a corrigir em `vigora_revit.py`).
+## Pontos a confirmar no primeiro teste real
+- Telhado: `SlopeAngle` da borda lido como tangente — conferir a inclinação na verificação.
 - Pisos: contorno lido do esboço do piso (Revit 2022+).
 - Peças geradas são *DirectShape* (Modelo genérico) — não editar à mão; gerar de novo.

@@ -11,8 +11,8 @@ import pytest
 
 from conftest import ROOT
 
-EXT = ROOT / "adapters" / "revit_pyrevit" / "Vigora.extension"
-PY_FILES = sorted(EXT.rglob("*.py"))
+EXT = ROOT                     # a raiz do repositório é a extensão pyRevit
+PY_FILES = sorted(list((EXT / "lib").rglob("*.py")) + list((EXT / "Vigora.tab").rglob("*.py")))
 
 
 def test_plugin_files_exist():
@@ -113,3 +113,26 @@ def test_engine_command_used_by_plugin(tmp_path):
     assert v["summary"]["errors"] == 0 and any("caixa 500 L" in i["message"] for i in v["issues"])
     proj = json.loads((tmp_path / "o" / "projeto.json").read_text(encoding="utf-8"))
     assert proj["meta"]["cliente"] == "Teste" and proj["tanks"][0]["model"] == "BR_500L"
+
+
+def test_repo_root_is_a_pyrevit_extension():
+    """Clonar como <pasta de extensões>/Vigora.extension e dar Reload deve mostrar a aba."""
+    assert (ROOT / "Vigora.tab" / "bundle.yaml").exists()
+    assert (ROOT / "lib" / "vigora_revit.py").exists() and (ROOT / "lib" / "vigora_ui.py").exists()
+    panels = sorted(p.name for p in (ROOT / "Vigora.tab").glob("*.panel"))
+    assert panels == ["Elementos.panel", "Framing.panel", "Projeto.panel", "Saidas.panel"]
+    assert (ROOT / "requirements.txt").exists()
+    assert not (ROOT / "adapters").exists()
+
+
+def test_plugin_finds_python_and_checks_dependencies(vr, tmp_path, monkeypatch):
+    monkeypatch.setattr(vr, "EXT_ROOT", str(tmp_path))                      # config.json vai para tmp
+    (tmp_path / "src").mkdir()
+    monkeypatch.setattr(vr, "_candidatos_python", lambda: [["nao-existe-python"], [sys.executable]])
+    cmd = vr.python_cmd()
+    assert cmd == [sys.executable]
+    assert json.loads((tmp_path / "config.json").read_text(encoding="utf-8"))["python"] == [sys.executable]
+    monkeypatch.setattr(vr, "EXT_ROOT", str(ROOT))
+    assert vr.dependencias_ok(cmd) is True
+    monkeypatch.setattr(vr, "DEPS_IMPORT", "import modulo_que_nao_existe_xyz")
+    assert vr.dependencias_ok(cmd) is False

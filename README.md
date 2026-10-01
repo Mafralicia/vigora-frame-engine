@@ -21,7 +21,7 @@ src/vigora_frame/
   revit_bridge.py peças -> sólidos 3D globais para o Revit
   export/         Excel, CSV, DXF, etiquetas (PDF+QR, ZPL), pranchas PDF
   cli.py          linha de comando
-adapters/revit_pyrevit/   extensão pyRevit (Exportar, Importar, Gerar framing)
+Vigora.tab/, lib/          plugin pyRevit (a raiz do repositório é a extensão)
 examples/       4 projetos de teste
 tests/          70 testes (unitários, propriedade, golden, exportação, Revit simulado)
 ```
@@ -157,7 +157,9 @@ Novos exemplos: `python examples/make_examples.py`.
 
 ## Revit (pyRevit) — plugin v2
 
-Instalação e uso: `adapters/revit_pyrevit/INSTALACAO_REVIT.md` (Revit 2024–2026, pyRevit 5).
+Instalação e uso: `INSTALACAO_REVIT.md` (Revit 2024–2026, pyRevit 5). Resumo:
+`git clone https://github.com/Mafralicia/vigora-frame-engine.git "$env:APPDATA\pyRevit\Extensions\Vigora.extension"`
+→ pyRevit *Reload* → aba **Vigora**. Python e bibliotecas do motor são detectados/instalados no primeiro uso.
 Como modelar para o motor: `GUIA_MODELAGEM.md` (1 página).
 
 - Aba **Vigora** com 4 painéis: Projeto (Configurar, Tipos de parede) · Framing (Verificar, Gerar, Últimos
