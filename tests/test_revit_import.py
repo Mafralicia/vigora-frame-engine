@@ -1,5 +1,6 @@
 """Importação do Revit: dados brutos (como o plugin extrai) -> projeto -> mesmo resultado dos exemplos."""
 import copy
+import json
 
 import pytest
 
@@ -126,7 +127,7 @@ def test_bad_roof_and_errors_link_to_revit_elements():
     proj, notes = normalize(raw, {})
     assert any(n["code"] == "V-095" and n["rids"] == [raw["roofs"][0]["rid"]] for n in notes)
     raw2 = fake_raw(p)
-    raw2["walls"][0]["curve"]["p1"][0] -= 50                  # parede que não encosta
+    raw2["walls"][0]["curve"]["p1"][0] -= 250                 # parede que não encosta (longe demais p/ costurar)
     proj2, notes2 = normalize(raw2, {})
     iss = issues_for_revit(run(proj2), notes2)
     bad = [i for i in iss if i["code"] == "V-075"]
@@ -141,3 +142,95 @@ def test_split_roof_edges_are_merged():
     raw["roofs"][0]["edges"][0:1] = [dict(e, p1=mid), dict(e, p0=mid)]       # borda dividida em dois segmentos
     proj, notes = normalize(raw, {})
     assert not notes and proj.roofs[0].kind == "gable"
+
+
+def revit_style_raw(p, width=180.0, loc_line=2):
+    """Como o Revit guarda: curva na FACE EXTERNA (loc_line=2), pontas no cruzamento das linhas de localização
+    nos cantos; parede em T termina na face da parede que ela encontra. Largura real (com acabamentos)."""
+    raw = fake_raw(p)
+    ext_ids = {w.id for w in p.walls if w.exterior}
+    cx = sum(sum(c) for w in p.walls for c in (w.start, w.end)) / (4 * len(p.walls))
+    for rw, w in zip(raw["walls"], p.walls):
+        (x0, y0), (x1, y1) = w.start, w.end
+        L = ((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5
+        u = ((x1 - x0) / L, (y1 - y0) / L)
+        n = (-u[1], u[0])
+        mid = ((x0 + x1) / 2, (y0 + y1) / 2)
+        cy = sum(sum(c) for c in [q for ww in p.walls for q in (ww.start, ww.end)]) / 1
+        # lado externo: o que se afasta do centro da casa
+        c0 = (sum(q[0] for ww in p.walls for q in (ww.start, ww.end)) / (2 * len(p.walls)),
+              sum(q[1] for ww in p.walls for q in (ww.start, ww.end)) / (2 * len(p.walls)))
+        ori = n if (mid[0] - c0[0]) * n[0] + (mid[1] - c0[1]) * n[1] > 0 else (-n[0], -n[1])
+        rw["orientation"] = list(ori)
+        rw["width"] = width
+        if w.id in ext_ids:
+            rw["location_line"] = loc_line
+            off = width / 2
+            a = (x0 + ori[0] * off - u[0] * off, y0 + ori[1] * off - u[1] * off)   # vai até o canto externo
+            b = (x1 + ori[0] * off + u[0] * off, y1 + ori[1] * off + u[1] * off)
+        else:
+            rw["location_line"] = 0
+            a = (x0 + u[0] * width / 2, y0 + u[1] * width / 2)                     # para na face da outra
+            b = (x1 - u[0] * width / 2, y1 - u[1] * width / 2)
+        rw["curve"] = {"kind": "line", "p0": list(a), "p1": list(b)}
+        for ins in rw["inserts"]:              # o Revit mede a partir do início da curva (que mudou)
+            ins["center_along"] += (x0 - a[0]) * u[0] + (y0 - a[1]) * u[1]
+    return raw
+
+
+@pytest.mark.parametrize("name", ["casa_terrea_wood", "casa_4aguas_wood", "salao_de_festas"])
+def test_revit_joined_walls_are_healed_to_axes(name):
+    p = load_project(ROOT / "examples" / f"{name}.json")
+    ref = run(p)
+    proj, notes = normalize(revit_style_raw(p), {"system": p.system,
+                                                 "roofs": {str(70000 + i): {k: getattr(r, k) for k in ("girder_setback",)
+                                                                            if getattr(r, k)} for i, r in enumerate(p.roofs)}})
+    got = run(proj)
+    bad = [i for i in got.issues if i.code in ("V-075", "V-061", "V-069", "V-074")]
+    assert not bad, [(i.code, i.message[:80]) for i in bad[:5]]
+    assert summary(got) == summary(ref)
+
+
+def test_drawing_gap_up_to_5mm_is_healed_and_logged_bigger_is_error():
+    p = load_project(ROOT / "examples" / "casa_terrea_wood.json")
+    raw = fake_raw(p)
+    raw["walls"][0]["curve"]["p1"][0] -= 4                    # 4 mm de folga: corrige e registra
+    proj, notes = normalize(raw, {})
+    assert not [i for i in run(proj).issues if i.code == "V-075"]
+    assert any(n["code"] == "V-121" and raw["walls"][0]["rid"] in n["rids"] for n in notes)
+    raw2 = fake_raw(p)
+    raw2["walls"][0]["curve"]["p1"][0] -= 50                  # 50 mm: folga real de desenho -> erro, sem mexer
+    proj2, notes2 = normalize(raw2, {})
+    assert any(i.code == "V-075" for i in run(proj2).issues)
+
+
+def test_degenerate_duplicate_and_zero_width_walls_are_ignored():
+    p = load_project(ROOT / "examples" / "casa_terrea_wood.json")
+    raw = fake_raw(p)
+    dup = json.loads(json.dumps(raw["walls"][1])); dup["rid"] = 77777
+    zero = json.loads(json.dumps(raw["walls"][2])); zero["rid"] = 77778; zero["curve"]["p1"] = list(zero["curve"]["p0"])
+    thin = json.loads(json.dumps(raw["walls"][3])); thin["rid"] = 77779; thin["width"] = 0.0
+    raw["walls"] += [dup, zero, thin]
+    proj, notes = normalize(raw, {})
+    codes = {n["code"] for n in notes}
+    assert {"V-128", "V-130", "V-131"} <= codes
+    assert len(proj.walls) == len(p.walls)
+    assert not [i for i in run(proj).issues if i.severity == "error"]
+
+
+def test_project_truss_preference_only_where_span_fits():
+    p = load_project(ROOT / "examples" / "casa_em_U_rincoes.json")
+    raw = fake_raw(p)
+    proj, _ = normalize(raw, {"roof_defaults": {"truss_type": "fink"}})
+    r = run(proj)
+    assert not [i for i in r.issues if i.code == "V-032"]          # asas de 3,6 m usam o tipo que cabe
+
+
+def test_issue_lines_always_name_the_element():
+    p = load_project(ROOT / "examples" / "casa_terrea_wood.json")
+    raw = fake_raw(p)
+    raw["walls"][0]["curve"]["p1"][0] -= 250
+    proj, notes = normalize(raw, {})
+    iss = issues_for_revit(run(proj), notes)
+    assert all(i["message"].startswith("[") or not i["element"] or i["element"] in i["message"]
+               for i in iss if i["severity"] == "error")

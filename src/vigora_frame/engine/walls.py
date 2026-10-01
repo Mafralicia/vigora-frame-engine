@@ -645,7 +645,7 @@ def _frame_panel(wf: WallFrame, ctx: Ctx, pi: int, xs: float, xe: float):
 
     for z in sorted(zlines):
         za, zb_ = z - t / 2, z + t / 2
-        mg = 20.0 if z in joint_lines else MIN_BLOCK
+        mg = MIN_BLOCK                      # nem na junta da placa: bloqueio < 60 mm não é fabricado
         vs = sorted([r for r in rects if r.role in VERTICAL and r.z0 <= za + EPS and r.z1 >= zb_ - EPS],
                     key=lambda r: r.x0)
         for a, b in zip(vs, vs[1:]):

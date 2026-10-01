@@ -345,6 +345,12 @@ def choose_type(rs: RoofSpec, span: float, ctx: Ctx) -> dict | None:
     for row in Rr["truss_table"]:
         if rs.truss_type and row["type"] == rs.truss_type:
             return row
+    pref = getattr(rs, "truss_type_pref", None)
+    if pref and not rs.truss_type:                          # preferência do projeto, se couber no vão
+        for row in Rr["truss_table"]:
+            if row["type"] == pref and row["span_min"] <= span < row["span_max"]:
+                return row
+    for row in Rr["truss_table"]:
         if not rs.truss_type and row["span_min"] <= span < row["span_max"]:
             return row
     return None

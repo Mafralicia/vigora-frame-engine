@@ -74,6 +74,7 @@ class RoofSpec(BaseModel):
     ridge_axis: Literal["x", "y"] = "x"      # direção da cumeeira (treliças distribuídas nessa direção)
     pitch_deg: float = 25.0
     ends: tuple[str, str] = ("gable", "gable")   # gable (oitão) | abut (encostado) | valley (rincão sobre outro telhado)
+    truss_type_pref: Optional[str] = None        # preferência do projeto: usada só se o vão estiver na faixa do tipo
     support: Literal["walls", "high_wall", "parapet"] = "walls"   # apoio: paredes | parede alta | platibanda
     bearing_height: Optional[float] = None       # platibanda: altura do banzo inferior (mm do piso do nível)
     parapet_min: float = 200.0                   # platibanda: altura mínima da mureta acima do telhado

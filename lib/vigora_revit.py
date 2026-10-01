@@ -21,7 +21,7 @@ from Autodesk.Revit import DB
 
 MM = 1.0 / 304.8           # mm -> pés
 APP_ID = "VigoraFrameEngine"
-TANK_FAMILY_KEYS = ("caixa", "tank", "reservat")
+TANK_FAMILY_KEYS = ("caixadagua", "caixad'agua", "reservatorio", "watertank", "vigoratank")
 
 
 # ------------------------------------------------------------------ compatibilidade de versões
@@ -220,9 +220,19 @@ def _escada(doc, s):
             "top_level_rid": rid(top.AsElementId()) if top else None, "runs": runs}
 
 
+def _sem_acento(txt):
+    """'Caixa D'Água 1000L' -> "caixad'agua1000l" (sem acento, espaço, hífen ou sublinhado)."""
+    import unicodedata
+    t = unicodedata.normalize("NFKD", u"%s" % txt)
+    t = u"".join(c for c in t if not unicodedata.combining(c)).lower()
+    for ch in (u" ", u"-", u"_", u"."):
+        t = t.replace(ch, u"")
+    return t
+
+
 def _caixa(doc, fi):
     try:
-        fam = fi.Symbol.Family.Name.lower()
+        fam = _sem_acento(fi.Symbol.Family.Name)
     except Exception:
         return None
     if not any(k in fam for k in TANK_FAMILY_KEYS) or fi.Location is None or not hasattr(fi.Location, "Point"):

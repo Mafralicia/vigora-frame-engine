@@ -15,6 +15,9 @@ from .model import Project
 
 # chave WALL_KEY_REF_PARAM do Revit -> deslocamento do eixo em relação à curva (em frações da espessura,
 # no sentido da orientação da parede, que aponta para o lado externo)
+HEAL_GAP = 5.0       # folga máxima de desenho corrigida automaticamente (mm); acima disso é erro V-075
+MIN_WALL_WIDTH = 38.0
+
 LOCATION_LINE = {0: 0.0, 1: 0.0, 2: -0.5, 3: 0.5, 4: -0.5, 5: 0.5}
 
 HINTS = {
@@ -33,6 +36,10 @@ HINTS = {
     "V-085": "A escada bate em uma parede: mova a escada ou a parede.",
     "V-095": "Desenhe um telhado por volume, retangular e alinhado aos eixos do projeto.",
     "V-096": "Escada em lance reto alinhada aos eixos; escadas em L/U ainda não são suportadas.",
+    "V-121": "Correção automática pequena (até 5 mm). Para eliminar, una as paredes no Revit.",
+    "V-128": "Apague a parede duplicada no Revit.",
+    "V-130": "Parede de comprimento zero: apague no Revit.",
+    "V-131": "Parede sem espessura (separação de ambientes) não gera framing.",
 }
 
 
@@ -69,9 +76,24 @@ def normalize(raw: dict, cfg: dict | None = None) -> tuple[Project, list]:
 
     # ---------------- paredes
     walls, curved = [], []
+    seen_geo = {}
     for w in raw.get("walls", []):
         if w["level_rid"] not in lv_id:
             continue
+        if w.get("width", 140.0) < MIN_WALL_WIDTH:
+            _issue(notes, "V-131", "info", "W%d" % w["rid"], "parede sem espessura estrutural ignorada", [w["rid"]])
+            continue
+        c_ = w["curve"]
+        if c_["kind"] == "line":
+            if _dist(c_["p0"], c_["p1"]) < 1.0:
+                _issue(notes, "V-130", "info", "W%d" % w["rid"], "parede de comprimento zero ignorada", [w["rid"]])
+                continue
+            key = (w["level_rid"],) + tuple(sorted([tuple(round(v / 5) for v in c_["p0"]), tuple(round(v / 5) for v in c_["p1"])]))
+            if key in seen_geo:
+                _issue(notes, "V-128", "warning", "W%d" % w["rid"],
+                       "parede duplicada de W%d (mesma posição) ignorada" % seen_geo[key], [w["rid"], seen_geo[key]])
+                continue
+            seen_geo[key] = w["rid"]
         wt = wall_types.get(w.get("type_name", ""), {})
         ov = wall_over.get(w["rid"], {})
         ext = ov.get("exterior", wt.get("exterior", w.get("type_function") == "Exterior"))
@@ -99,6 +121,9 @@ def normalize(raw: dict, cfg: dict | None = None) -> tuple[Project, list]:
         if ov.get("wall_type") or wt.get("wall_type"):
             item["wall_type"] = ov.get("wall_type") or wt.get("wall_type")
         walls.append(item)
+
+    heal_walls(walls, {("W%d" % w["rid"]): w.get("width", 140.0) for w in raw.get("walls", [])}, notes,
+               centered={("W%d" % w["rid"]) for w in raw.get("walls", []) if int(w.get("location_line", 0)) in (0, 1)})
 
     def faces(level_id, axis):
         """Faces externas das paredes externas: (coordenada, extensão) para 'x' (paredes ao longo de x)."""
@@ -311,11 +336,113 @@ def normalize(raw: dict, cfg: dict | None = None) -> tuple[Project, list]:
         "system": system, "ruleset": ruleset, "levels": levels, "walls": walls, "curved_walls": curved,
         "roofs": roofs, "floors": floors, "stairs": stairs, "tanks": tanks, "meta": meta})
     for r in proj.roofs:
-        spc = cfg.get("roof_defaults", {})
+        spc = dict(cfg.get("roof_defaults", {}))
+        pref = spc.pop("truss_type", None)
+        if pref and not r.truss_type:
+            r.truss_type_pref = pref                          # padrão do projeto: só onde o vão couber
         for k_, v in spc.items():
             if v not in (None, "", "auto") and getattr(r, k_, None) in (None, "") and k_ != "outline":
                 setattr(r, k_, v)
     return proj, notes
+
+
+def _line_inter(p0, p1, q0, q1):
+    """Interseção das retas infinitas p0-p1 e q0-q1 (None se paralelas)."""
+    d1 = (p1[0] - p0[0], p1[1] - p0[1])
+    d2 = (q1[0] - q0[0], q1[1] - q0[1])
+    den = d1[0] * d2[1] - d1[1] * d2[0]
+    L = math.hypot(*d1) * math.hypot(*d2)
+    if L == 0 or abs(den) < 1e-6 * L:
+        return None
+    t = ((q0[0] - p0[0]) * d2[1] - (q0[1] - p0[1]) * d2[0]) / den
+    return (p0[0] + d1[0] * t, p0[1] + d1[1] * t)
+
+
+def heal_walls(walls, widths, notes=None, extra=60.0, centered=()):  # noqa: C901
+    """Costura as pontas no eixo depois da correção da linha de localização do Revit.
+
+    Canto L: as duas pontas vão para o cruzamento dos eixos. Encontro T: a ponta vai para o eixo da parede
+    que ela encontra (vale se o Revit parou a curva na face ou na linha de localização da outra). Ponta que
+    passa um pouco da outra parede é aparada. Só mexe quando a distância é menor que as meias espessuras + 60 mm.
+    """
+    for _ in range(3):
+        moved = 0
+        for a in walls:
+            for end in ("start", "end"):
+                P = tuple(a[end])
+                Q = tuple(a["end"] if end == "start" else a["start"])
+                La = _dist(P, Q)
+                if La < 1:
+                    continue
+                best = None
+                for b in walls:
+                    if b is a or b["level"] != a["level"]:
+                        continue
+                    B0, B1 = tuple(b["start"]), tuple(b["end"])
+                    Lb = _dist(B0, B1)
+                    if Lb < 1:
+                        continue
+                    tol = (widths.get(a["id"], 140.0) + widths.get(b["id"], 140.0)) / 2 + extra
+                    X = _line_inter(P, Q, B0, B1)
+                    if X is None:                       # paralelas: continuação na mesma linha
+                        for Bx in (B0, B1):
+                            ub = ((B1[0] - B0[0]) / Lb, (B1[1] - B0[1]) / Lb)
+                            off = abs((P[0] - B0[0]) * ub[1] - (P[1] - B0[1]) * ub[0])
+                            d = _dist(P, Bx)
+                            if off < 5 and 0.5 < d < tol and (best is None or d < best[0]):
+                                best = (d, ((P[0] + Bx[0]) / 2, (P[1] + Bx[1]) / 2), b, Bx)
+                        continue
+                    d = _dist(P, X)
+                    if d < 0.5 or d > tol:
+                        continue
+                    ub = ((B1[0] - B0[0]) / Lb, (B1[1] - B0[1]) / Lb)
+                    tb = (X[0] - B0[0]) * ub[0] + (X[1] - B0[1]) * ub[1]
+                    if tb < -tol or tb > Lb + tol:      # o cruzamento precisa estar na parede b (ou na ponta dela)
+                        continue
+                    ua = ((Q[0] - P[0]) / La, (Q[1] - P[1]) / La)
+                    ta = (X[0] - P[0]) * ua[0] + (X[1] - P[1]) * ua[1]
+                    if ta > La - 1:                     # não pode atravessar a própria parede
+                        continue
+                    if best is None or d < best[0]:
+                        bend = B0 if abs(tb) <= tol and abs(tb) < abs(Lb - tb) else (B1 if abs(Lb - tb) <= tol else None)
+                        best = (d, X, b, bend)
+            # aplica (e leva junto a ponta da outra parede no canto L)
+                if best is None:
+                    continue
+                d, X, b, bend = best
+                X = (round(X[0], 1), round(X[1], 1))
+                wa_, wb_ = widths.get(a["id"], 140.0), widths.get(b["id"], 140.0)
+                # padrões legítimos do Revit: ponta no eixo, na face de uma das paredes, ou nas duas faces
+                padroes = (0.0, wa_ / 2, wb_ / 2, (wa_ + wb_) / 2)
+                excess = min(abs(d - k) for k in padroes)
+                if excess > HEAL_GAP + 0.5:                   # folga real de desenho > 5 mm: não corrige (V-075)
+                    continue
+                if notes is not None and excess > 0.5:        # correção pequena, sempre registrada
+                    _issue(notes, "V-121", "info", a["id"],
+                           "ponta da parede ajustada %.1f mm para encontrar %s (folga no desenho do Revit)" % (excess, b["id"]),
+                           [int(a["id"][1:].rstrip("AB"))])
+                _move_end(a, end, X)
+                if bend is not None:
+                    bkey = "start" if tuple(b["start"]) == tuple(bend) else "end"
+                    if _dist(tuple(b[bkey]), X) <= (widths.get(a["id"], 140.0) + widths.get(b["id"], 140.0)) / 2 + extra:
+                        _move_end(b, bkey, X)
+                moved += 1
+        if not moved:
+            break
+
+
+def _move_end(w, end, X):
+    """Move a ponta e mantém as aberturas no mesmo lugar (offset medido a partir do início)."""
+    old = tuple(w[end])
+    if end == "start":
+        e = tuple(w["end"])
+        L = _dist(old, e)
+        if L > 0:
+            u = ((e[0] - old[0]) / L, (e[1] - old[1]) / L)
+            shift = (X[0] - old[0]) * u[0] + (X[1] - old[1]) * u[1]
+            for o in w["openings"]:
+                o["offset"] = round(o["offset"] - shift, 1)
+    w[end] = [X[0], X[1]]
 
 
 def _merge_edges(edges):
@@ -395,7 +522,10 @@ def issues_for_revit(result, notes=()) -> list:
         if i.severity == "info" and i.code == "V-000" and "caixa" not in i.message and "rincão" not in i.message:
             continue
         rids = sorted({int(m) for m in RID.findall(" " + (i.element or "")) + RID.findall(" " + i.message)})
-        out.append({"code": i.code, "severity": i.severity, "element": i.element, "message": i.message,
+        msg = i.message
+        if i.element and i.element not in msg:
+            msg = "[%s] %s" % (i.element.replace("RVT-", ""), msg)
+        out.append({"code": i.code, "severity": i.severity, "element": i.element, "message": msg,
                     "rids": rids, "hint": HINTS.get(i.code, "")})
     order = {"error": 0, "warning": 1, "info": 2}
     return sorted(out, key=lambda d: (order.get(d["severity"], 3), d["code"]))
