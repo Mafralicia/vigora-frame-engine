@@ -6,7 +6,7 @@ requires-python = ">=3.11"
 dependencies = ["pydantic>=2", "pyyaml", "shapely>=2", "openpyxl", "matplotlib", "reportlab", "ezdxf", "qrcode", "typer"]
 
 [project.optional-dependencies]
-test = ["pytest", "hypothesis"]
+test = ["pytest", "hypothesis", "parso==0.7.1"]
 
 [project.scripts]
 vigora-frame = "vigora_frame.cli:app"

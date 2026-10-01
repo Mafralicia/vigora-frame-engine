@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Janelas do plugin (pyRevit WPF). Resultados com "Mostrar no modelo" e configuração do projeto."""
+from __future__ import print_function
 import os
 
 from pyrevit import forms

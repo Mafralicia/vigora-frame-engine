@@ -11,6 +11,7 @@ Fluxo de cada botão:
   verificacao.json (erros com ids do Revit)  e  revit_solidos.json (peças 3D)
   aplicar_solidos(doc, dados): DirectShape por peça, atualização por diferença.
 """
+from __future__ import print_function
 import io
 import json
 import math
@@ -287,10 +288,16 @@ def _run(cmd, env=None, timeout=None):
         kw["env"] = env
     try:
         p = subprocess.Popen(cmd, **kw)
-        out, _ = p.communicate()
-        return p.returncode, out
+    except TypeError:                         # IronPython antigo sem creationflags
+        kw.pop("creationflags", None)
+        try:
+            p = subprocess.Popen(cmd, **kw)
+        except Exception as ex:
+            return -1, str(ex)
     except Exception as ex:
         return -1, str(ex)
+    out, _ = p.communicate()
+    return p.returncode, out
 
 
 def _env():
@@ -443,7 +450,7 @@ def _solido(s):
     return DB.GeometryCreationUtilities.CreateExtrusionGeometry([loop], e.Normalize(), e.GetLength())
 
 
-def aplicar_solidos(doc, dados, log=print):
+def aplicar_solidos(doc, dados, log=None):
     """Cria/atualiza DirectShapes. Mantém peças iguais, recria as alteradas, apaga as removidas."""
     existentes = {}
     for ds in DB.FilteredElementCollector(doc).OfClass(DB.DirectShape):
@@ -478,7 +485,8 @@ def aplicar_solidos(doc, dados, log=print):
                 criados += 1
             except Exception as ex:
                 falhas += 1
-                log("falha em %s: %s" % (pid, ex))
+                if log:
+                    log("falha em %s: %s" % (pid, ex))
         t.Commit()
     except Exception:
         t.RollBack()

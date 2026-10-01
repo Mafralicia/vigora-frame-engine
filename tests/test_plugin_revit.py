@@ -25,6 +25,15 @@ def test_plugin_files_exist():
 
 
 @pytest.mark.parametrize("path", PY_FILES, ids=lambda p: str(p.relative_to(EXT)))
+def test_parses_with_python27_grammar(path):
+    """O pyRevit roda IronPython 2.7: o arquivo precisa compilar com a gramática do Python 2.7."""
+    parso = pytest.importorskip("parso")
+    g = parso.load_grammar(version="2.7")
+    errs = list(g.iter_errors(g.parse(path.read_text(encoding="utf-8"))))
+    assert not errs, [(e.start_pos, e.message) for e in errs[:3]]
+
+
+@pytest.mark.parametrize("path", PY_FILES, ids=lambda p: str(p.relative_to(EXT)))
 def test_ironpython_compatible_syntax(path):
     tree = ast.parse(path.read_text(encoding="utf-8"))
     for node in ast.walk(tree):
