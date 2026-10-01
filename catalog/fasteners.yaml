@@ -1,0 +1,19 @@
+# Fixadores e conectores. Valores de REFERÊNCIA, sem aprovação.
+version: "fasteners-0.1"
+items:
+  - {id: PREGO-ANEL-3.3x90,   system: wood,  category: nail,  waste: 0.10, approved_by: null}
+  - {id: PREGO-ANEL-2.9x50,   system: wood,  category: nail,  waste: 0.10, approved_by: null}
+  - {id: PARAF-AUTOBROC-4.2x13, system: steel, category: screw, waste: 0.10, approved_by: null}
+  - {id: PARAF-PLACA-4.2x32,  system: steel, category: screw, waste: 0.10, approved_by: null}
+  - {id: CHUMBADOR-M12,       system: both,  category: anchor, waste: 0.05, approved_by: null}
+  - {id: HOLDDOWN-HD1,        system: both,  category: connector, waste: 0.0, approved_by: null}
+  - {id: CONECTOR-ARRANC-H1,  system: both,  category: connector, waste: 0.05, approved_by: null}
+  - {id: CHAPA-DENTADA-CD1,   system: wood,  category: connector, waste: 0.05, approved_by: null}
+  - {id: GUSSET-G1,           system: steel, category: connector, waste: 0.05, approved_by: null}
+  - {id: SUPORTE-VIGA-SV1,    system: both,  category: connector, waste: 0.05, approved_by: null}
+  - {id: CHAPA-BASE-PILAR,    system: both,  category: connector, waste: 0.0, approved_by: null}
+  - {id: CAIXA-BR_500L,        system: both,  category: equipment, waste: 0.0, approved_by: null}
+  - {id: CAIXA-BR_1000L,       system: both,  category: equipment, waste: 0.0, approved_by: null}
+  - {id: BACIA-CONTENCAO-1450, system: both,  category: equipment, waste: 0.0, approved_by: null}
+  - {id: BACIA-CONTENCAO-1700, system: both,  category: equipment, waste: 0.0, approved_by: null}
+  - {id: TUBO-PVC-32,          system: both,  category: pipe, waste: 0.10, approved_by: null}

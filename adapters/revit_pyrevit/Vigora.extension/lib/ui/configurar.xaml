@@ -1,0 +1,70 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Vigora — Configurar projeto" Width="560" Height="640" WindowStartupLocation="CenterScreen"
+        FontFamily="Segoe UI" FontSize="12" Background="#FAF7F2" ResizeMode="NoResize">
+  <DockPanel Margin="16">
+    <StackPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+      <TextBlock Text="VIGORA · Frame Engine" FontSize="11" Foreground="#B8672F" FontWeight="SemiBold"/>
+      <TextBlock Text="Configurar projeto" FontSize="20" FontWeight="Bold" Foreground="#15110B"/>
+      <TextBlock Text="Salvo ao lado do .rvt (modelo.vigora.json). Vale para todo o projeto." Foreground="#5A4C38"/>
+    </StackPanel>
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+      <Button Content="Salvar" Width="110" Height="30" Margin="0,0,8,0" Background="#8A5530" Foreground="White"
+              Click="salvar"/>
+      <Button Content="Cancelar" Width="90" Height="30" Click="cancelar"/>
+    </StackPanel>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+      <StackPanel>
+        <GroupBox Header="Sistema e saídas" Margin="0,0,0,10" Padding="8">
+          <Grid>
+            <Grid.ColumnDefinitions><ColumnDefinition Width="170"/><ColumnDefinition/></Grid.ColumnDefinitions>
+            <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+            <TextBlock Text="Sistema construtivo" VerticalAlignment="Center"/>
+            <ComboBox x:Name="sistema" Grid.Column="1" Margin="0,3">
+              <ComboBoxItem Content="wood"/><ComboBoxItem Content="steel"/></ComboBox>
+            <TextBlock Grid.Row="1" Text="Formato das pranchas" VerticalAlignment="Center"/>
+            <ComboBox x:Name="formato" Grid.Row="1" Grid.Column="1" Margin="0,3">
+              <ComboBoxItem Content="A1"/><ComboBoxItem Content="A0"/></ComboBox>
+            <TextBlock Grid.Row="2" Text="Gerar pranchas ao gerar" VerticalAlignment="Center"/>
+            <CheckBox x:Name="pranchas" Grid.Row="2" Grid.Column="1" Margin="0,6" IsChecked="True"/>
+          </Grid>
+        </GroupBox>
+        <GroupBox Header="Dados da obra (legenda das pranchas)" Margin="0,0,0,10" Padding="8">
+          <Grid>
+            <Grid.ColumnDefinitions><ColumnDefinition Width="170"/><ColumnDefinition/></Grid.ColumnDefinitions>
+            <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/>
+              <RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+            <TextBlock Text="Cliente" VerticalAlignment="Center"/><TextBox x:Name="cliente" Grid.Column="1" Margin="0,3"/>
+            <TextBlock Grid.Row="1" Text="Local da obra" VerticalAlignment="Center"/>
+            <TextBox x:Name="local" Grid.Row="1" Grid.Column="1" Margin="0,3"/>
+            <TextBlock Grid.Row="2" Text="Responsável técnico" VerticalAlignment="Center"/>
+            <TextBox x:Name="responsavel_tecnico" Grid.Row="2" Grid.Column="1" Margin="0,3"/>
+            <TextBlock Grid.Row="3" Text="CREA" VerticalAlignment="Center"/>
+            <TextBox x:Name="crea" Grid.Row="3" Grid.Column="1" Margin="0,3"/>
+            <TextBlock Grid.Row="4" Text="ART / RRT" VerticalAlignment="Center"/>
+            <TextBox x:Name="art" Grid.Row="4" Grid.Column="1" Margin="0,3"/>
+            <TextBlock Grid.Row="5" Text="Desenho / verificação" VerticalAlignment="Center"/>
+            <TextBox x:Name="desenho" Grid.Row="5" Grid.Column="1" Margin="0,3"/>
+            <TextBlock Grid.Row="6" Text="Revisão" VerticalAlignment="Center"/>
+            <TextBox x:Name="revisao" Grid.Row="6" Grid.Column="1" Margin="0,3"/>
+          </Grid>
+        </GroupBox>
+        <GroupBox Header="Telhados (padrão do projeto; cada telhado pode mudar no botão Telhado)" Padding="8">
+          <Grid>
+            <Grid.ColumnDefinitions><ColumnDefinition Width="170"/><ColumnDefinition/></Grid.ColumnDefinitions>
+            <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+            <TextBlock Text="Tipo de treliça" VerticalAlignment="Center"/>
+            <ComboBox x:Name="truss_type" Grid.Column="1" Margin="0,3">
+              <ComboBoxItem Content="Automático (pelo vão)"/><ComboBoxItem Content="fink"/>
+              <ComboBoxItem Content="howe"/><ComboBoxItem Content="pratt"/></ComboBox>
+            <TextBlock Grid.Row="1" Text="Espaçamento (mm)" VerticalAlignment="Center"/>
+            <ComboBox x:Name="spacing" Grid.Row="1" Grid.Column="1" Margin="0,3">
+              <ComboBoxItem Content="Padrão das regras"/><ComboBoxItem Content="600"/><ComboBoxItem Content="400"/></ComboBox>
+            <TextBlock Grid.Row="2" Text="Beiral (mm, vazio = desenho)" VerticalAlignment="Center"/>
+            <TextBox x:Name="overhang" Grid.Row="2" Grid.Column="1" Margin="0,3"/>
+          </Grid>
+        </GroupBox>
+      </StackPanel>
+    </ScrollViewer>
+  </DockPanel>
+</Window>

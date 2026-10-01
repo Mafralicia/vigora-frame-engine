@@ -1,0 +1,16 @@
+[project]
+name = "vigora-frame"
+version = "0.1.0"
+description = "Vigora Frame Engine: framing wood/steel, quantitativo, pranchas e dados de fábrica"
+requires-python = ">=3.11"
+dependencies = ["pydantic>=2", "pyyaml", "shapely>=2", "openpyxl", "matplotlib", "reportlab", "ezdxf", "qrcode", "typer"]
+
+[project.optional-dependencies]
+test = ["pytest", "hypothesis"]
+
+[project.scripts]
+vigora-frame = "vigora_frame.cli:app"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

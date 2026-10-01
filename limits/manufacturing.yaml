@@ -1,0 +1,5 @@
+# Limites da fábrica e do transporte (REFERÊNCIA)
+panel_table: {max_length: 7200, max_height: 3200}
+truck: {max_length: 12000, max_width: 2500, max_height: 3000, max_payload_kg: 12000}
+truss_transport: {max_height: 3000, max_length: 13500}
+crane_capacity_kg: 800

@@ -1,0 +1,41 @@
+# Catálogo de materiais Vigora Frame Engine
+# ATENÇÃO: valores de REFERÊNCIA para desenvolvimento e teste.
+# Nenhum item está aprovado (approved_by: null). Execuções saem como RASCUNHO
+# até o engenheiro responsável preencher e aprovar cada item usado.
+# Unidades: mm, kg.
+version: "catalog-0.1"
+items:
+  # ---------------- Madeira serrada ----------------
+  - {id: W-38x89,  system: wood, category: lumber, face: 38, depth: 89,  stock_lengths: [3000, 3600, 4800, 6000], density_kg_m3: 500, species: definir, strength_class: definir, treatment: definir, approved_by: null}
+  - {id: W-38x140, system: wood, category: lumber, face: 38, depth: 140, stock_lengths: [3000, 3600, 4800, 6000], density_kg_m3: 500, species: definir, strength_class: definir, treatment: definir, approved_by: null}
+  - {id: W-38x184, system: wood, category: lumber, face: 38, depth: 184, stock_lengths: [3000, 3600, 4800, 6000], density_kg_m3: 500, species: definir, strength_class: definir, treatment: definir, approved_by: null}
+  - {id: W-38x235, system: wood, category: lumber, face: 38, depth: 235, stock_lengths: [3000, 3600, 4800, 6000], density_kg_m3: 500, species: definir, strength_class: definir, treatment: definir, approved_by: null}
+  - {id: W-38x286, system: wood, category: lumber, face: 38, depth: 286, stock_lengths: [3000, 3600, 4800, 6000], density_kg_m3: 500, species: definir, strength_class: definir, treatment: definir, approved_by: null}
+  # ---------------- Madeira engenheirada ----------------
+  - {id: LVL-45x240, system: wood, category: engineered, face: 45, depth: 240, stock_lengths: [6000, 9000, 12000], density_kg_m3: 550, approved_by: null}
+  - {id: LVL-45x300, system: wood, category: engineered, face: 45, depth: 300, stock_lengths: [6000, 9000, 12000], density_kg_m3: 550, approved_by: null}
+  # ---------------- Perfis de aço formados a frio (LSF) ----------------
+  # shape Ue: alma (web) x mesa (flange) x enrijecedor (lip) x espessura
+  - {id: LSF-UE-90-095,  system: steel, category: stud,  shape: Ue, web: 90,  flange: 40, lip: 12, thickness: 0.95, stock_lengths: [6000], steel_grade: definir, coating: definir, approved_by: null}
+  - {id: LSF-UE-140-095, system: steel, category: stud,  shape: Ue, web: 140, flange: 40, lip: 12, thickness: 0.95, stock_lengths: [6000], steel_grade: definir, coating: definir, approved_by: null}
+  - {id: LSF-UE-140-125, system: steel, category: stud,  shape: Ue, web: 140, flange: 40, lip: 12, thickness: 1.25, stock_lengths: [6000], steel_grade: definir, coating: definir, approved_by: null}
+  - {id: LSF-UE-200-125, system: steel, category: joist, shape: Ue, web: 200, flange: 40, lip: 12, thickness: 1.25, stock_lengths: [6000], steel_grade: definir, coating: definir, approved_by: null}
+  - {id: LSF-U-92-095,   system: steel, category: track, shape: U,  web: 92,  flange: 40, lip: 0,  thickness: 0.95, stock_lengths: [6000], steel_grade: definir, coating: definir, approved_by: null}
+  - {id: LSF-U-142-095,  system: steel, category: track, shape: U,  web: 142, flange: 40, lip: 0,  thickness: 0.95, stock_lengths: [6000], steel_grade: definir, coating: definir, approved_by: null}
+  - {id: LSF-U-202-125,  system: steel, category: track, shape: U,  web: 202, flange: 40, lip: 0,  thickness: 1.25, stock_lengths: [6000], steel_grade: definir, coating: definir, approved_by: null}
+  - {id: LSF-FITA-100x0.8, system: steel, category: strap, shape: flat, web: 100, flange: 0, lip: 0, thickness: 0.8, stock_lengths: [30000], approved_by: null}
+  - {id: LSF-FITA-40x0.95, system: steel, category: strap, shape: flat, web: 40, flange: 0, lip: 0, thickness: 0.95, stock_lengths: [30000], approved_by: null}
+  # ---------------- Placas ----------------
+  - {id: OSB-11.1-1200x2400, system: both, category: sheet, thickness: 11.1, size: [1200, 2400], density_kg_m3: 620, use: structural, approved_by: null}
+  - {id: OSB-15.1-1200x2400, system: both, category: sheet, thickness: 15.1, size: [1200, 2400], density_kg_m3: 620, use: structural, approved_by: null}
+  - {id: OSB-18.3-1200x2400, system: both, category: sheet, thickness: 18.3, size: [1200, 2400], density_kg_m3: 620, use: subfloor, approved_by: null}
+  - {id: GESSO-ST-12.5-1200x2400, system: both, category: sheet, thickness: 12.5, size: [1200, 2400], density_kg_m3: 700, use: finish, approved_by: null}
+  - {id: CIMENTICIA-10-1200x2400, system: both, category: sheet, thickness: 10, size: [1200, 2400], density_kg_m3: 1300, use: finish, approved_by: null}
+  - {id: GESSO-FLEX-6.5-1200x2400, system: both, category: sheet, thickness: 6.5, size: [1200, 2400], density_kg_m3: 700, use: finish, min_radius: 900, approved_by: null}
+  # ---------------- Membranas e isolamento (por m²) ----------------
+  - {id: MEMBRANA-HIDROFUGA, system: both, category: membrane, roll: [1500, 50000], overlap: 150, approved_by: null}
+  - {id: LA-MINERAL, system: both, category: insulation, approved_by: null}
+  # ---------------- Pilares ----------------
+  - {id: PILAR-3x38x140, system: wood, category: column, face: 114, depth: 140, capacity_kN: 30, stock_lengths: [3000, 3600, 4800, 6000], density_kg_m3: 500, approved_by: null}
+  - {id: PILAR-LVL-90x140, system: wood, category: column, face: 90, depth: 140, capacity_kN: 45, stock_lengths: [6000], density_kg_m3: 550, approved_by: null}
+  - {id: PILAR-2UE-140-125, system: steel, category: column, face: 80, depth: 140, capacity_kN: 40, stock_lengths: [6000], approved_by: null}

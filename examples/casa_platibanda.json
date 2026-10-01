@@ -1,0 +1,198 @@
+{
+ "id": "CT15",
+ "name": "Casa com platibanda (telhado embutido 10%)",
+ "system": "wood",
+ "ruleset": "wood-br-v1",
+ "levels": [
+  {
+   "id": "L1",
+   "name": "Térreo",
+   "elevation": 0,
+   "height": 2700
+  }
+ ],
+ "walls": [
+  {
+   "id": "ES",
+   "level": "L1",
+   "start": [
+    70.0,
+    70.0
+   ],
+   "end": [
+    8930.0,
+    70.0
+   ],
+   "height": 3850,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J1",
+     "kind": "window",
+     "offset": 700,
+     "width": 1600,
+     "height": 1400,
+     "sill": 900
+    },
+    {
+     "id": "P1",
+     "kind": "door",
+     "offset": 2700,
+     "width": 1000,
+     "height": 2100,
+     "sill": 0
+    },
+    {
+     "id": "J2",
+     "kind": "window",
+     "offset": 5800,
+     "width": 2000,
+     "height": 1400,
+     "sill": 900
+    }
+   ]
+  },
+  {
+   "id": "EN",
+   "level": "L1",
+   "start": [
+    70.0,
+    7130.0
+   ],
+   "end": [
+    8930.0,
+    7130.0
+   ],
+   "height": 3850,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J3",
+     "kind": "window",
+     "offset": 1200,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    },
+    {
+     "id": "J4",
+     "kind": "window",
+     "offset": 6200,
+     "width": 1200,
+     "height": 1000,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "EW",
+   "level": "L1",
+   "start": [
+    70.0,
+    70.0
+   ],
+   "end": [
+    70.0,
+    7130.0
+   ],
+   "height": 3850,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J5",
+     "kind": "window",
+     "offset": 2500,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "EE",
+   "level": "L1",
+   "start": [
+    8930.0,
+    70.0
+   ],
+   "end": [
+    8930.0,
+    7130.0
+   ],
+   "height": 3850,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J6",
+     "kind": "window",
+     "offset": 2500,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "I1",
+   "level": "L1",
+   "start": [
+    4500,
+    70
+   ],
+   "end": [
+    4500,
+    7130
+   ],
+   "height": 2700,
+   "exterior": false,
+   "bearing": false,
+   "openings": [
+    {
+     "id": "P2",
+     "kind": "door",
+     "offset": 4200,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  }
+ ],
+ "roofs": [
+  {
+   "id": "R1",
+   "level": "L1",
+   "kind": "mono",
+   "ridge_axis": "x",
+   "pitch_deg": 5.7,
+   "support": "parapet",
+   "bearing_height": 2700,
+   "outline": [
+    [
+     0,
+     0
+    ],
+    [
+     9000,
+     0
+    ],
+    [
+     9000,
+     7200
+    ],
+    [
+     0,
+     7200
+    ]
+   ]
+  }
+ ],
+ "floors": [],
+ "curved_walls": [],
+ "columns": [],
+ "stairs": []
+}

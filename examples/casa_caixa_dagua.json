@@ -1,0 +1,292 @@
+{
+ "id": "CT16",
+ "name": "Casa com caixa d'água 1000L no ático",
+ "system": "wood",
+ "ruleset": "wood-br-v1",
+ "levels": [
+  {
+   "id": "L1",
+   "name": "Térreo",
+   "elevation": 0,
+   "height": 2700
+  }
+ ],
+ "walls": [
+  {
+   "id": "ES",
+   "level": "L1",
+   "start": [
+    70.0,
+    70.0
+   ],
+   "end": [
+    10730.0,
+    70.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J1",
+     "kind": "window",
+     "offset": 800,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    },
+    {
+     "id": "P1",
+     "kind": "door",
+     "offset": 4600,
+     "width": 1000,
+     "height": 2100,
+     "sill": 0
+    },
+    {
+     "id": "J2",
+     "kind": "window",
+     "offset": 7600,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "EN",
+   "level": "L1",
+   "start": [
+    70.0,
+    8330.0
+   ],
+   "end": [
+    10730.0,
+    8330.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J3",
+     "kind": "window",
+     "offset": 800,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    },
+    {
+     "id": "J4",
+     "kind": "window",
+     "offset": 5400,
+     "width": 600,
+     "height": 600,
+     "sill": 1500
+    },
+    {
+     "id": "J5",
+     "kind": "window",
+     "offset": 7600,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "EW",
+   "level": "L1",
+   "start": [
+    70.0,
+    70.0
+   ],
+   "end": [
+    70.0,
+    8330.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J6",
+     "kind": "window",
+     "offset": 1200,
+     "width": 1200,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "EE",
+   "level": "L1",
+   "start": [
+    10730.0,
+    70.0
+   ],
+   "end": [
+    10730.0,
+    8330.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J7",
+     "kind": "window",
+     "offset": 1200,
+     "width": 1200,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "H1",
+   "level": "L1",
+   "start": [
+    70,
+    3450
+   ],
+   "end": [
+    10730,
+    3450
+   ],
+   "height": 2700,
+   "exterior": false,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "P2",
+     "kind": "door",
+     "offset": 1500,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    },
+    {
+     "id": "P3",
+     "kind": "door",
+     "offset": 6500,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  },
+  {
+   "id": "H2",
+   "level": "L1",
+   "start": [
+    70,
+    4950
+   ],
+   "end": [
+    10730,
+    4950
+   ],
+   "height": 2700,
+   "exterior": false,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "P4",
+     "kind": "door",
+     "offset": 1500,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    },
+    {
+     "id": "P5",
+     "kind": "door",
+     "offset": 6500,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    },
+    {
+     "id": "P6",
+     "kind": "door",
+     "offset": 8800,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  },
+  {
+   "id": "B1",
+   "level": "L1",
+   "start": [
+    4200,
+    70
+   ],
+   "end": [
+    4200,
+    3450
+   ],
+   "height": 2700,
+   "exterior": false,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "P7",
+     "kind": "door",
+     "offset": 2200,
+     "width": 700,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  },
+  {
+   "id": "B2",
+   "level": "L1",
+   "start": [
+    4200,
+    4950
+   ],
+   "end": [
+    4200,
+    8330
+   ],
+   "height": 2700,
+   "exterior": false,
+   "bearing": false,
+   "openings": [
+    {
+     "id": "P8",
+     "kind": "door",
+     "offset": 700,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  }
+ ],
+ "roofs": [
+  {
+   "id": "R1",
+   "level": "L1",
+   "kind": "gable",
+   "ridge_axis": "x",
+   "pitch_deg": 30
+  }
+ ],
+ "floors": [],
+ "curved_walls": [],
+ "columns": [],
+ "stairs": [],
+ "tanks": [
+  {
+   "id": "CX1",
+   "model": "BR_1000L",
+   "level": "L1"
+  }
+ ]
+}

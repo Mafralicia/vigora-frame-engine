@@ -1,0 +1,308 @@
+{
+ "id": "CT13",
+ "name": "Casa americana 4 águas com asa (rincões)",
+ "system": "wood",
+ "ruleset": "wood-br-v1",
+ "levels": [
+  {
+   "id": "L1",
+   "name": "Térreo",
+   "elevation": 0,
+   "height": 2700
+  }
+ ],
+ "walls": [
+  {
+   "id": "N",
+   "level": "L1",
+   "start": [
+    70,
+    8330
+   ],
+   "end": [
+    11930,
+    8330
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J1",
+     "kind": "window",
+     "offset": 1500,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    },
+    {
+     "id": "J2",
+     "kind": "window",
+     "offset": 8000,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "W",
+   "level": "L1",
+   "start": [
+    70,
+    70
+   ],
+   "end": [
+    70,
+    8330
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J3",
+     "kind": "window",
+     "offset": 1500,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "E",
+   "level": "L1",
+   "start": [
+    11930,
+    70
+   ],
+   "end": [
+    11930,
+    8330
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "P1",
+     "kind": "door",
+     "offset": 3000,
+     "width": 900,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  },
+  {
+   "id": "S",
+   "level": "L1",
+   "start": [
+    70,
+    70
+   ],
+   "end": [
+    11930,
+    70
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J4",
+     "kind": "window",
+     "offset": 1300,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    },
+    {
+     "id": "P2",
+     "kind": "door",
+     "offset": 5100,
+     "width": 1600,
+     "height": 2100,
+     "sill": 0
+    },
+    {
+     "id": "J5",
+     "kind": "window",
+     "offset": 8600,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "AW",
+   "level": "L1",
+   "start": [
+    4270,
+    -4730
+   ],
+   "end": [
+    4270,
+    70
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J6",
+     "kind": "window",
+     "offset": 1800,
+     "width": 1200,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "AE",
+   "level": "L1",
+   "start": [
+    7730,
+    -4730
+   ],
+   "end": [
+    7730,
+    70
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J7",
+     "kind": "window",
+     "offset": 1800,
+     "width": 1200,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "AS",
+   "level": "L1",
+   "start": [
+    4270,
+    -4730
+   ],
+   "end": [
+    7730,
+    -4730
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "P3",
+     "kind": "door",
+     "offset": 1300,
+     "width": 900,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  },
+  {
+   "id": "I1",
+   "level": "L1",
+   "start": [
+    70,
+    4200
+   ],
+   "end": [
+    11930,
+    4200
+   ],
+   "height": 2700,
+   "exterior": false,
+   "bearing": false,
+   "openings": [
+    {
+     "id": "P4",
+     "kind": "door",
+     "offset": 2000,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    },
+    {
+     "id": "P5",
+     "kind": "door",
+     "offset": 9000,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  }
+ ],
+ "roofs": [
+  {
+   "id": "R1",
+   "level": "L1",
+   "kind": "hip",
+   "ridge_axis": "x",
+   "pitch_deg": 25,
+   "outline": [
+    [
+     0,
+     0
+    ],
+    [
+     12000,
+     0
+    ],
+    [
+     12000,
+     8400
+    ],
+    [
+     0,
+     8400
+    ]
+   ]
+  },
+  {
+   "id": "R2",
+   "level": "L1",
+   "kind": "gable",
+   "ridge_axis": "y",
+   "pitch_deg": 25,
+   "ends": [
+    "gable",
+    "valley"
+   ],
+   "outline": [
+    [
+     4200,
+     -4800
+    ],
+    [
+     7800,
+     -4800
+    ],
+    [
+     7800,
+     0
+    ],
+    [
+     4200,
+     0
+    ]
+   ]
+  }
+ ],
+ "floors": [],
+ "curved_walls": [],
+ "columns": [],
+ "stairs": []
+}

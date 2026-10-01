@@ -1,0 +1,479 @@
+{
+ "id": "SB02",
+ "name": "Sobrado 150 m² 4 águas",
+ "system": "wood",
+ "ruleset": "wood-br-v1",
+ "levels": [
+  {
+   "id": "L1",
+   "name": "Térreo",
+   "elevation": 0,
+   "height": 2700
+  },
+  {
+   "id": "L2",
+   "name": "Superior",
+   "elevation": 2953.3,
+   "height": 2600
+  }
+ ],
+ "walls": [
+  {
+   "id": "ES",
+   "level": "L1",
+   "start": [
+    70.0,
+    70.0
+   ],
+   "end": [
+    8330.0,
+    70.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J1",
+     "kind": "window",
+     "offset": 600,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    },
+    {
+     "id": "P1",
+     "kind": "door",
+     "offset": 3600,
+     "width": 1000,
+     "height": 2100,
+     "sill": 0
+    },
+    {
+     "id": "J2",
+     "kind": "window",
+     "offset": 6000,
+     "width": 1200,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "EN",
+   "level": "L1",
+   "start": [
+    70.0,
+    8930.0
+   ],
+   "end": [
+    8330.0,
+    8930.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J3",
+     "kind": "window",
+     "offset": 600,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    },
+    {
+     "id": "J4",
+     "kind": "window",
+     "offset": 5800,
+     "width": 1200,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "EW",
+   "level": "L1",
+   "start": [
+    70.0,
+    70.0
+   ],
+   "end": [
+    70.0,
+    8930.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J5",
+     "kind": "window",
+     "offset": 3200,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "EE",
+   "level": "L1",
+   "start": [
+    8330.0,
+    70.0
+   ],
+   "end": [
+    8330.0,
+    8930.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "P2",
+     "kind": "door",
+     "offset": 5000,
+     "width": 900,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  },
+  {
+   "id": "I1",
+   "level": "L1",
+   "start": [
+    2800,
+    70
+   ],
+   "end": [
+    2800,
+    8930
+   ],
+   "height": 2700,
+   "exterior": false,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "P3",
+     "kind": "door",
+     "offset": 1500,
+     "width": 900,
+     "height": 2100,
+     "sill": 0
+    },
+    {
+     "id": "P4",
+     "kind": "door",
+     "offset": 6400,
+     "width": 900,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  },
+  {
+   "id": "I2",
+   "level": "L1",
+   "start": [
+    5600,
+    70
+   ],
+   "end": [
+    5600,
+    8930
+   ],
+   "height": 2700,
+   "exterior": false,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "P5",
+     "kind": "door",
+     "offset": 2000,
+     "width": 900,
+     "height": 2100,
+     "sill": 0
+    },
+    {
+     "id": "P6",
+     "kind": "door",
+     "offset": 6000,
+     "width": 900,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  },
+  {
+   "id": "FS",
+   "level": "L2",
+   "start": [
+    70.0,
+    70.0
+   ],
+   "end": [
+    8330.0,
+    70.0
+   ],
+   "height": 2600,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J7",
+     "kind": "window",
+     "offset": 800,
+     "width": 1200,
+     "height": 1100,
+     "sill": 1000
+    },
+    {
+     "id": "J8",
+     "kind": "window",
+     "offset": 3600,
+     "width": 1200,
+     "height": 1100,
+     "sill": 1000
+    },
+    {
+     "id": "J9",
+     "kind": "window",
+     "offset": 6700,
+     "width": 600,
+     "height": 600,
+     "sill": 1500
+    }
+   ]
+  },
+  {
+   "id": "FN",
+   "level": "L2",
+   "start": [
+    70.0,
+    8930.0
+   ],
+   "end": [
+    8330.0,
+    8930.0
+   ],
+   "height": 2600,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J10",
+     "kind": "window",
+     "offset": 600,
+     "width": 1500,
+     "height": 1100,
+     "sill": 1000
+    },
+    {
+     "id": "J11",
+     "kind": "window",
+     "offset": 5800,
+     "width": 1200,
+     "height": 1100,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "FW",
+   "level": "L2",
+   "start": [
+    70.0,
+    70.0
+   ],
+   "end": [
+    70.0,
+    8930.0
+   ],
+   "height": 2600,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J12",
+     "kind": "window",
+     "offset": 4000,
+     "width": 1200,
+     "height": 1100,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "FE",
+   "level": "L2",
+   "start": [
+    8330.0,
+    70.0
+   ],
+   "end": [
+    8330.0,
+    8930.0
+   ],
+   "height": 2600,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J13",
+     "kind": "window",
+     "offset": 5400,
+     "width": 1200,
+     "height": 1100,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "I3",
+   "level": "L2",
+   "start": [
+    2800,
+    70
+   ],
+   "end": [
+    2800,
+    8930
+   ],
+   "height": 2600,
+   "exterior": false,
+   "bearing": false,
+   "openings": [
+    {
+     "id": "P7",
+     "kind": "door",
+     "offset": 3000,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  },
+  {
+   "id": "I4",
+   "level": "L2",
+   "start": [
+    5600,
+    70
+   ],
+   "end": [
+    5600,
+    8930
+   ],
+   "height": 2600,
+   "exterior": false,
+   "bearing": false,
+   "openings": [
+    {
+     "id": "P8",
+     "kind": "door",
+     "offset": 3000,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  },
+  {
+   "id": "I5",
+   "level": "L2",
+   "start": [
+    5600,
+    4500
+   ],
+   "end": [
+    8330,
+    4500
+   ],
+   "height": 2600,
+   "exterior": false,
+   "bearing": false,
+   "openings": [
+    {
+     "id": "P9",
+     "kind": "door",
+     "offset": 800,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  }
+ ],
+ "roofs": [
+  {
+   "id": "R1",
+   "level": "L2",
+   "kind": "hip",
+   "ridge_axis": "y",
+   "pitch_deg": 25
+  }
+ ],
+ "floors": [
+  {
+   "id": "F2",
+   "level": "L2",
+   "outline": [
+    [
+     0,
+     0
+    ],
+    [
+     8400,
+     0
+    ],
+    [
+     8400,
+     9000
+    ],
+    [
+     0,
+     9000
+    ]
+   ],
+   "holes": [
+    [
+     [
+      3000,
+      5150
+     ],
+     [
+      4000,
+      5150
+     ],
+     [
+      4000,
+      8800
+     ],
+     [
+      3000,
+      8800
+     ]
+    ]
+   ],
+   "joist_direction": "x"
+  }
+ ],
+ "curved_walls": [],
+ "columns": [],
+ "stairs": [
+  {
+   "id": "E1",
+   "level": "L2",
+   "start": [
+    3500,
+    4320
+   ],
+   "direction": "+y",
+   "width": 960
+  }
+ ]
+}

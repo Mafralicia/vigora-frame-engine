@@ -1,0 +1,36 @@
+# Caixas d'água (padrão Vigora / Brasil). Valores de REFERÊNCIA — confirmar na ficha do fabricante.
+version: "tanks-0.1"
+water_tank_presets:
+  BR_500L:
+    brand: "Fortlev / Tigre"
+    material: "Polietileno (PEAD)"
+    capacity_liters: 500
+    weight_full_kn: 5.0
+    tank_diameter_m: 1.24
+    tank_height_m: 0.84
+    tray_diameter_m: 1.45
+    tray_height_m: 0.15
+    maintenance_clearance_top_m: 0.50
+  BR_1000L:
+    brand: "Fortlev / Tigre"
+    material: "Polietileno (PEAD)"
+    capacity_liters: 1000
+    weight_full_kn: 10.0
+    tank_diameter_m: 1.50
+    tank_height_m: 0.97
+    tray_diameter_m: 1.70
+    tray_height_m: 0.20
+    maintenance_clearance_top_m: 0.50
+default_installation:
+  location: attic
+  primary_support: bearing_walls_intersection
+  secondary_support: dedicated_double_joist
+  roof_adaptation: attic_opening_no_web_clash
+support_rules:                 # regra estrutural Vigora (REFERÊNCIA; aprovação do engenheiro)
+  beam_item: W-38x235
+  beam_plies: 2
+  beam_max_span_mm: 1500       # vão livre máximo entre paredes portantes
+  min_bearing_mm: 70           # apoio mínimo da viga sobre o frechal
+  deck_item: OSB-18.3-1200x2400
+  overflow_pipe: TUBO-PVC-32
+  approved_by: null

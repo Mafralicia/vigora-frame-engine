@@ -1,0 +1,342 @@
+{
+ "id": "CT05",
+ "name": "Casa em L com anexo (dois telhados)",
+ "system": "wood",
+ "ruleset": "wood-br-v1",
+ "levels": [
+  {
+   "id": "L1",
+   "name": "Térreo",
+   "elevation": 0,
+   "height": 2700
+  }
+ ],
+ "walls": [
+  {
+   "id": "MS",
+   "level": "L1",
+   "start": [
+    70.0,
+    70.0
+   ],
+   "end": [
+    8930.0,
+    70.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J1",
+     "kind": "window",
+     "offset": 800,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    },
+    {
+     "id": "P1",
+     "kind": "door",
+     "offset": 5000,
+     "width": 1000,
+     "height": 2100,
+     "sill": 0
+    },
+    {
+     "id": "J2",
+     "kind": "window",
+     "offset": 6400,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "MN",
+   "level": "L1",
+   "start": [
+    70.0,
+    7130.0
+   ],
+   "end": [
+    8930.0,
+    7130.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J3",
+     "kind": "window",
+     "offset": 1200,
+     "width": 1200,
+     "height": 1200,
+     "sill": 1000
+    },
+    {
+     "id": "J4",
+     "kind": "window",
+     "offset": 5800,
+     "width": 1200,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "MW",
+   "level": "L1",
+   "start": [
+    70.0,
+    70.0
+   ],
+   "end": [
+    70.0,
+    7130.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J5",
+     "kind": "window",
+     "offset": 1200,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "ME",
+   "level": "L1",
+   "start": [
+    8930.0,
+    70.0
+   ],
+   "end": [
+    8930.0,
+    7130.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J6",
+     "kind": "window",
+     "offset": 300,
+     "width": 600,
+     "height": 600,
+     "sill": 1500
+    },
+    {
+     "id": "P2",
+     "kind": "door",
+     "offset": 3200,
+     "width": 900,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  },
+  {
+   "id": "AS",
+   "level": "L1",
+   "start": [
+    8930,
+    1270
+   ],
+   "end": [
+    13730,
+    1270
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J7",
+     "kind": "window",
+     "offset": 1400,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "AN",
+   "level": "L1",
+   "start": [
+    8930,
+    5930
+   ],
+   "end": [
+    13730,
+    5930
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J8",
+     "kind": "window",
+     "offset": 1400,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "AE",
+   "level": "L1",
+   "start": [
+    13730,
+    1270
+   ],
+   "end": [
+    13730,
+    5930
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "P3",
+     "kind": "door",
+     "offset": 1800,
+     "width": 900,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  },
+  {
+   "id": "I1",
+   "level": "L1",
+   "start": [
+    4500,
+    70
+   ],
+   "end": [
+    4500,
+    7130
+   ],
+   "height": 2700,
+   "exterior": false,
+   "bearing": false,
+   "openings": [
+    {
+     "id": "P4",
+     "kind": "door",
+     "offset": 1500,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    },
+    {
+     "id": "P5",
+     "kind": "door",
+     "offset": 5000,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  },
+  {
+   "id": "I2",
+   "level": "L1",
+   "start": [
+    70,
+    3600
+   ],
+   "end": [
+    4500,
+    3600
+   ],
+   "height": 2700,
+   "exterior": false,
+   "bearing": false,
+   "openings": [
+    {
+     "id": "P6",
+     "kind": "door",
+     "offset": 2400,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  }
+ ],
+ "roofs": [
+  {
+   "id": "R1",
+   "level": "L1",
+   "kind": "gable",
+   "ridge_axis": "x",
+   "pitch_deg": 25,
+   "outline": [
+    [
+     0,
+     0
+    ],
+    [
+     9000,
+     0
+    ],
+    [
+     9000,
+     7200
+    ],
+    [
+     0,
+     7200
+    ]
+   ]
+  },
+  {
+   "id": "R2",
+   "level": "L1",
+   "kind": "gable",
+   "ridge_axis": "x",
+   "pitch_deg": 20,
+   "ends": [
+    "abut",
+    "gable"
+   ],
+   "overhang": 626,
+   "outline": [
+    [
+     9000,
+     1200
+    ],
+    [
+     13800,
+     1200
+    ],
+    [
+     13800,
+     6000
+    ],
+    [
+     9000,
+     6000
+    ]
+   ]
+  }
+ ],
+ "floors": [],
+ "curved_walls": [],
+ "columns": [],
+ "stairs": []
+}

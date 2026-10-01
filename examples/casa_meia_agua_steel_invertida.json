@@ -1,0 +1,195 @@
+{
+ "id": "CT10",
+ "name": "Casa 55 m² meia-água (steel)",
+ "system": "steel",
+ "ruleset": "steel-br-v1",
+ "levels": [
+  {
+   "id": "L1",
+   "name": "Térreo",
+   "elevation": 0,
+   "height": 2700
+  }
+ ],
+ "walls": [
+  {
+   "id": "ES",
+   "level": "L1",
+   "start": [
+    70.0,
+    70.0
+   ],
+   "end": [
+    8330.0,
+    70.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J1",
+     "kind": "window",
+     "offset": 500,
+     "width": 2000,
+     "height": 1500,
+     "sill": 700
+    },
+    {
+     "id": "P1",
+     "kind": "door",
+     "offset": 3200,
+     "width": 900,
+     "height": 2100,
+     "sill": 0
+    },
+    {
+     "id": "J2",
+     "kind": "window",
+     "offset": 5600,
+     "width": 2000,
+     "height": 1500,
+     "sill": 700
+    }
+   ]
+  },
+  {
+   "id": "EN",
+   "level": "L1",
+   "start": [
+    70.0,
+    6530.0
+   ],
+   "end": [
+    8330.0,
+    6530.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J3",
+     "kind": "window",
+     "offset": 1000,
+     "width": 1200,
+     "height": 1000,
+     "sill": 1100
+    },
+    {
+     "id": "J4",
+     "kind": "window",
+     "offset": 5200,
+     "width": 800,
+     "height": 600,
+     "sill": 1500
+    }
+   ]
+  },
+  {
+   "id": "EW",
+   "level": "L1",
+   "start": [
+    70.0,
+    70.0
+   ],
+   "end": [
+    70.0,
+    6530.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J5",
+     "kind": "window",
+     "offset": 2000,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "EE",
+   "level": "L1",
+   "start": [
+    8330.0,
+    70.0
+   ],
+   "end": [
+    8330.0,
+    6530.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": []
+  },
+  {
+   "id": "I1",
+   "level": "L1",
+   "start": [
+    4800,
+    70
+   ],
+   "end": [
+    4800,
+    6530
+   ],
+   "height": 2700,
+   "exterior": false,
+   "bearing": false,
+   "openings": [
+    {
+     "id": "P2",
+     "kind": "door",
+     "offset": 4400,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  },
+  {
+   "id": "I2",
+   "level": "L1",
+   "start": [
+    4800,
+    3300
+   ],
+   "end": [
+    8330,
+    3300
+   ],
+   "height": 2700,
+   "exterior": false,
+   "bearing": false,
+   "openings": [
+    {
+     "id": "P3",
+     "kind": "door",
+     "offset": 1200,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  }
+ ],
+ "roofs": [
+  {
+   "id": "R1",
+   "level": "L1",
+   "kind": "mono",
+   "ridge_axis": "x",
+   "pitch_deg": 10,
+   "high_side": "start"
+  }
+ ],
+ "floors": [],
+ "curved_walls": [],
+ "columns": [],
+ "stairs": []
+}

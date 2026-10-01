@@ -1,0 +1,114 @@
+# Ruleset STEEL FRAME (LSF) - versão de desenvolvimento.
+# Valores de REFERÊNCIA. approval.approved_by = null => execuções saem como RASCUNHO.
+ruleset: steel-br-v1.0-dev
+system: steel
+units: mm
+approval: {approved_by: null, registro: null, date: null}
+
+wall_types:
+  PE-01: {name: "Externa portante", stud: LSF-UE-140-095, track: LSF-U-142-095, spacing: 400, sheathing: OSB-11.1-1200x2400, sheathing_side: exterior, finish_board: GESSO-ST-12.5-1200x2400}
+  PE-02: {name: "Externa não portante", stud: LSF-UE-90-095, track: LSF-U-92-095, spacing: 600, sheathing: OSB-11.1-1200x2400, sheathing_side: exterior, finish_board: GESSO-ST-12.5-1200x2400}
+  PI-01: {name: "Interna portante", stud: LSF-UE-90-095, track: LSF-U-92-095, spacing: 400, sheathing: null, finish_board: GESSO-ST-12.5-1200x2400}
+  PI-02: {name: "Divisória", stud: LSF-UE-90-095, track: LSF-U-92-095, spacing: 600, sheathing: null, finish_board: GESSO-ST-12.5-1200x2400}
+auto_wall_type: {exterior_bearing: PE-01, exterior_nonbearing: PE-02, interior_bearing: PI-01, interior_nonbearing: PI-02}
+
+plates: {bottom: 1, top: 1}
+stud_clearance: 3
+spacing_tolerance: 0
+in_line_tolerance: 20
+
+panels:
+  max_length: 6000
+  min_length: 600
+  min_joint_to_opening: 150
+  max_weight_kg: 250
+
+openings:
+  clearance_per_side: 10
+  clearance_top: 10
+  header_table: tables/headers_steel.csv
+  min_cripple_length: 60
+  min_distance_to_corner: 100
+  min_distance_between: 80
+
+corners: {corner_style: two_stud_backer, t_junction_style: double_stud_ladder}
+
+blocking:
+  fixed_rows: [1200, 2400]     # linhas de bloqueio padronizadas (mm do piso do painel); 2400 = junta da placa
+  spacing_vertical: 1200
+  when_no_structural_sheathing: true
+  at_sheathing_joints: true
+  strap: LSF-FITA-40x0.95
+
+sheathing:
+  orientation: vertical
+  fastening: {edge_pitch: 150, field_pitch: 300, fastener: PARAF-PLACA-4.2x32}
+  edge_support_required: true
+
+bracing:
+  method: segmented
+  strap_x: {item: LSF-FITA-100x0.8, angle_min: 30, angle_max: 60, gusset: GUSSET-G1}
+  min_segment_length: 600
+  min_effective_length: {default: 3000}
+  hold_down: {item: HOLDDOWN-HD1, at: segment_ends}
+
+anchorage:
+  base: {item: CHUMBADOR-M12, max_from_plate_end: 300, pitch: 1200}
+  roof_uplift: {item: CONECTOR-ARRANC-H1, per_bearing: 1}
+
+connections:
+  LG-01: {name: "montante-guia inferior", fastener: PARAF-AUTOBROC-4.2x13, qty: 2}
+  LG-02: {name: "montante-guia superior", fastener: PARAF-AUTOBROC-4.2x13, qty: 2}
+  LG-04: {name: "montante-montante", fastener: PARAF-AUTOBROC-4.2x13, qty_per_m: 4}
+  LG-05: {name: "verga-apoio", fastener: PARAF-AUTOBROC-4.2x13, qty: 4}
+  LG-06: {name: "painel-painel", fastener: PARAF-AUTOBROC-4.2x13, qty_per_m: 3}
+  LG-07: {name: "painel-base", fastener: CHUMBADOR-M12, qty: 0}
+  LG-15: {name: "bloqueador-montante", fastener: PARAF-AUTOBROC-4.2x13, qty: 4}
+  LG-16: {name: "peitoril/cripple", fastener: PARAF-AUTOBROC-4.2x13, qty: 2}
+  LG-17: {name: "fita-montante", fastener: PARAF-AUTOBROC-4.2x13, qty: 1}
+
+  LG-09: {name: "viga de piso - borda/cabeceira", fastener: PARAF-AUTOBROC-4.2x13, qty: 4}
+  LG-11: {name: "nó de treliça", fastener: GUSSET-G1, qty: 2}
+
+floors:
+  joist: LSF-UE-200-125
+  rim: LSF-U-202-125
+  spacing: 400
+  max_span: 3600
+  bridging_spacing: 2100
+  subfloor: OSB-18.3-1200x2400
+  subfloor_waste: 0.08
+  hole_trimmer_plies: 2
+  hole_header_plies: 2
+
+roof:
+  spacing: 400
+  heel_height: 0
+  overhang: 500
+  batten_spacing: 350
+  bottom_chord_restraint_max: 2400
+  truss_table:
+    - {type: kingpost, span_min: 0,    span_max: 5000,  top: LSF-UE-90-095, bottom: LSF-UE-90-095, web: LSF-UE-90-095}
+    - {type: fink,     span_min: 5000, span_max: 10000, top: LSF-UE-140-095, bottom: LSF-UE-90-095, web: LSF-UE-90-095}
+    - {type: howe,     span_min: 10000, span_max: 13000, top: LSF-UE-140-125, bottom: LSF-UE-140-095, web: LSF-UE-90-095}
+  mono: {top: LSF-UE-140-095, bottom: LSF-UE-90-095, web: LSF-UE-90-095, span_max: 7000}
+  gable: {top: LSF-UE-90-095, bottom: LSF-UE-90-095, web: LSF-UE-90-095}
+  plate: GUSSET-G1
+  batten: LSF-UE-90-095
+  restraint: LSF-FITA-40x0.95
+
+curved_wall: {min_radius: 1500, max_chord: 1200, max_sagitta: 25, min_chord: 200, facet_joint_style: double_stud}
+
+columns: {load_factor_kPa: 3.5}
+
+manufacturing:
+  kerf: 2
+  offcut_min_reusable: 400
+  tolerances: {length: 1, squareness_deg: 0.5, stud_position: 2, diagonal_diff: 3}
+
+basis:
+  wall_types.PE-01.spacing: {type: tabela_do_engenheiro, ref: "PREENCHER", approved_by: null}
+  openings.header_table:    {type: tabela_do_engenheiro, ref: "PREENCHER", approved_by: null}
+  bracing.min_effective_length: {type: decisao_do_engenheiro, ref: "PREENCHER", approved_by: null}
+  floors.max_span:          {type: tabela_do_engenheiro, ref: "PREENCHER", approved_by: null}
+  roof.truss_table:         {type: tabela_do_engenheiro, ref: "PREENCHER", approved_by: null}

@@ -1,0 +1,207 @@
+{
+ "id": "CT01",
+ "name": "Casa térrea 60 m² (wood frame)",
+ "system": "wood",
+ "ruleset": "wood-br-v1",
+ "levels": [
+  {
+   "id": "L1",
+   "name": "Térreo",
+   "elevation": 0,
+   "height": 2700
+  }
+ ],
+ "walls": [
+  {
+   "id": "W01",
+   "level": "L1",
+   "start": [
+    70,
+    70
+   ],
+   "end": [
+    8330,
+    70
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J1",
+     "kind": "window",
+     "offset": 900,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    },
+    {
+     "id": "P1",
+     "kind": "door",
+     "offset": 5000,
+     "width": 1000,
+     "height": 2100,
+     "sill": 0
+    },
+    {
+     "id": "J2",
+     "kind": "window",
+     "offset": 6800,
+     "width": 1000,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "W02",
+   "level": "L1",
+   "start": [
+    8330,
+    70
+   ],
+   "end": [
+    8330,
+    7130
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "P2",
+     "kind": "door",
+     "offset": 3000,
+     "width": 900,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  },
+  {
+   "id": "W03",
+   "level": "L1",
+   "start": [
+    70,
+    7130
+   ],
+   "end": [
+    8330,
+    7130
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J3",
+     "kind": "window",
+     "offset": 1200,
+     "width": 1200,
+     "height": 1200,
+     "sill": 1000
+    },
+    {
+     "id": "J4",
+     "kind": "window",
+     "offset": 5400,
+     "width": 600,
+     "height": 600,
+     "sill": 1500
+    }
+   ]
+  },
+  {
+   "id": "W04",
+   "level": "L1",
+   "start": [
+    70,
+    70
+   ],
+   "end": [
+    70,
+    7130
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J5",
+     "kind": "window",
+     "offset": 1600,
+     "width": 1200,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "W05",
+   "level": "L1",
+   "start": [
+    4200,
+    70
+   ],
+   "end": [
+    4200,
+    7130
+   ],
+   "height": 2700,
+   "exterior": false,
+   "bearing": false,
+   "openings": [
+    {
+     "id": "P3",
+     "kind": "door",
+     "offset": 1500,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    },
+    {
+     "id": "P4",
+     "kind": "door",
+     "offset": 4500,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  },
+  {
+   "id": "W06",
+   "level": "L1",
+   "start": [
+    70,
+    3600
+   ],
+   "end": [
+    4200,
+    3600
+   ],
+   "height": 2700,
+   "exterior": false,
+   "bearing": false,
+   "openings": [
+    {
+     "id": "P5",
+     "kind": "door",
+     "offset": 2000,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  }
+ ],
+ "roofs": [
+  {
+   "id": "R1",
+   "level": "L1",
+   "kind": "gable",
+   "ridge_axis": "x",
+   "pitch_deg": 25
+  }
+ ]
+}

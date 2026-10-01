@@ -1,0 +1,202 @@
+{
+ "id": "CT06",
+ "name": "Chalé 50 m² 2 águas 40°",
+ "system": "wood",
+ "ruleset": "wood-br-v1",
+ "levels": [
+  {
+   "id": "L1",
+   "name": "Térreo",
+   "elevation": 0,
+   "height": 2700
+  }
+ ],
+ "walls": [
+  {
+   "id": "ES",
+   "level": "L1",
+   "start": [
+    70.0,
+    70.0
+   ],
+   "end": [
+    5930.0,
+    70.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "P1",
+     "kind": "door",
+     "offset": 2400,
+     "width": 1000,
+     "height": 2100,
+     "sill": 0
+    },
+    {
+     "id": "J1",
+     "kind": "window",
+     "offset": 800,
+     "width": 800,
+     "height": 1200,
+     "sill": 1000
+    },
+    {
+     "id": "J2",
+     "kind": "window",
+     "offset": 4200,
+     "width": 800,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "EN",
+   "level": "L1",
+   "start": [
+    70.0,
+    8330.0
+   ],
+   "end": [
+    5930.0,
+    8330.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J3",
+     "kind": "window",
+     "offset": 2200,
+     "width": 1500,
+     "height": 1500,
+     "sill": 800
+    }
+   ]
+  },
+  {
+   "id": "EW",
+   "level": "L1",
+   "start": [
+    70.0,
+    70.0
+   ],
+   "end": [
+    70.0,
+    8330.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J4",
+     "kind": "window",
+     "offset": 1500,
+     "width": 1200,
+     "height": 1200,
+     "sill": 1000
+    },
+    {
+     "id": "J5",
+     "kind": "window",
+     "offset": 6200,
+     "width": 1200,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "EE",
+   "level": "L1",
+   "start": [
+    5930.0,
+    70.0
+   ],
+   "end": [
+    5930.0,
+    8330.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J6",
+     "kind": "window",
+     "offset": 3200,
+     "width": 1500,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "I1",
+   "level": "L1",
+   "start": [
+    70,
+    5400
+   ],
+   "end": [
+    5930,
+    5400
+   ],
+   "height": 2700,
+   "exterior": false,
+   "bearing": false,
+   "openings": [
+    {
+     "id": "P2",
+     "kind": "door",
+     "offset": 400,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    },
+    {
+     "id": "P3",
+     "kind": "door",
+     "offset": 4000,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  },
+  {
+   "id": "I2",
+   "level": "L1",
+   "start": [
+    1800,
+    5400
+   ],
+   "end": [
+    1800,
+    8330
+   ],
+   "height": 2700,
+   "exterior": false,
+   "bearing": false,
+   "openings": []
+  }
+ ],
+ "roofs": [
+  {
+   "id": "R1",
+   "level": "L1",
+   "kind": "gable",
+   "ridge_axis": "y",
+   "pitch_deg": 40
+  }
+ ],
+ "floors": [],
+ "curved_walls": [],
+ "columns": [],
+ "stairs": []
+}

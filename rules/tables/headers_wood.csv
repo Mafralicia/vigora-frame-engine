@@ -1,0 +1,12 @@
+load_case,span_max_mm,header_item,plies,jack_per_side,king_per_side,notes
+nao_portante,1200,W-38x89,1,1,1,REFERENCIA - substituir pela tabela do engenheiro
+nao_portante,2400,W-38x140,2,1,1,REFERENCIA
+cobertura,900,W-38x140,2,1,1,REFERENCIA
+cobertura,1500,W-38x184,2,1,1,REFERENCIA
+cobertura,1900,W-38x235,2,2,1,REFERENCIA
+cobertura,2500,W-38x286,3,2,1,REFERENCIA
+cobertura,3500,LVL-45x300,2,2,2,REFERENCIA - verga engenheirada
+piso_e_cobertura,900,W-38x184,2,1,1,REFERENCIA
+piso_e_cobertura,1500,W-38x235,2,2,1,REFERENCIA
+piso_e_cobertura,2100,W-38x286,3,2,1,REFERENCIA
+piso_e_cobertura,3000,LVL-45x300,3,3,2,REFERENCIA - verga engenheirada

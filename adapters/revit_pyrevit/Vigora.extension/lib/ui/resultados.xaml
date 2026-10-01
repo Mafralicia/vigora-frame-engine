@@ -1,0 +1,22 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Vigora — Verificação do modelo" Width="900" Height="560" WindowStartupLocation="CenterScreen"
+        FontFamily="Segoe UI" FontSize="12" Background="#FAF7F2">
+  <DockPanel Margin="14">
+    <StackPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+      <TextBlock Text="VIGORA · Frame Engine" FontSize="11" Foreground="#B8672F" FontWeight="SemiBold"/>
+      <TextBlock x:Name="titulo" Text="Resultado" FontSize="20" FontWeight="Bold" Foreground="#15110B"/>
+      <TextBlock x:Name="resumo" Text="" Foreground="#5A4C38" Margin="0,4,0,0" TextWrapping="Wrap"/>
+    </StackPanel>
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+      <CheckBox x:Name="so_problemas" Content="Só erros e avisos" IsChecked="True" VerticalAlignment="Center"
+                Margin="0,0,16,0" Click="filtrar"/>
+      <Button x:Name="bt_mostrar" Content="Mostrar no modelo" Width="150" Height="30" Margin="0,0,8,0"
+              Background="#8A5530" Foreground="White" Click="mostrar"/>
+      <Button Content="Copiar relatório" Width="130" Height="30" Margin="0,0,8,0" Click="copiar"/>
+      <Button Content="Fechar" Width="90" Height="30" Click="fechar"/>
+    </StackPanel>
+    <ListBox x:Name="lista" FontFamily="Consolas" FontSize="12" BorderBrush="#D9CFC2"
+             MouseDoubleClick="mostrar"/>
+  </DockPanel>
+</Window>

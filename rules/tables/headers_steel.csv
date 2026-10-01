@@ -1,0 +1,9 @@
+load_case,span_max_mm,header_item,plies,jack_per_side,king_per_side,notes
+nao_portante,1500,LSF-UE-90-095,2,1,1,REFERENCIA - substituir pela tabela do engenheiro
+nao_portante,2400,LSF-UE-140-095,2,1,1,REFERENCIA
+cobertura,1200,LSF-UE-140-095,2,1,1,REFERENCIA
+cobertura,2000,LSF-UE-140-125,2,2,1,REFERENCIA
+cobertura,3000,LSF-UE-200-125,2,2,1,REFERENCIA
+piso_e_cobertura,1000,LSF-UE-140-125,2,1,1,REFERENCIA
+piso_e_cobertura,1800,LSF-UE-200-125,2,2,1,REFERENCIA
+piso_e_cobertura,2600,LSF-UE-200-125,3,2,2,REFERENCIA

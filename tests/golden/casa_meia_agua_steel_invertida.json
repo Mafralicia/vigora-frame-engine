@@ -1,0 +1,37 @@
+{
+ "panels": 11,
+ "members": 706,
+ "connections": 1638,
+ "sheets": 58,
+ "trusses": 22,
+ "members_by_role": {
+  "BACKER": 20,
+  "BATTEN": 44,
+  "BC_RESTRAINT": 2,
+  "BLOCK": 166,
+  "BOTTOM_CHORD": 44,
+  "BOTTOM_PLATE": 14,
+  "BRACE_STRAP": 12,
+  "CRIPPLE": 44,
+  "DIAG_BRACE": 2,
+  "HEADER": 8,
+  "JACK": 24,
+  "KING": 16,
+  "SILL": 5,
+  "STRAP": 22,
+  "STUD": 52,
+  "STUD_END": 22,
+  "TOP_CHORD": 44,
+  "TOP_PLATE": 11,
+  "WEB": 154
+ },
+ "errors": 0,
+ "quantities": {
+  "linear_m": 1472.4,
+  "bars": 230,
+  "yield": 0.9225,
+  "kg_linear": 2254.5,
+  "sheets": 31
+ },
+ "run_id": "94116445-e7726f"
+}

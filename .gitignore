@@ -1,0 +1,17 @@
+# saídas geradas (recriadas com: python -m vigora_frame.cli run ...)
+out/
+*_vigora/
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+.hypothesis/
+*.egg-info/
+.venv/
+# configuração local da máquina (caminhos do python/repo)
+adapters/revit_pyrevit/config.json
+# arquivos do Revit
+*.rvt
+*.rfa
+*.rvt.bak
+*.0001.rvt
