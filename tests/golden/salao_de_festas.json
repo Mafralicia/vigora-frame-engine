@@ -27,11 +27,11 @@
  },
  "errors": 0,
  "quantities": {
-  "linear_m": 2655.3,
+  "linear_m": 2655.2,
   "bars": 460,
-  "yield": 0.9802,
+  "yield": 0.9801,
   "kg_linear": 6420.9,
   "sheets": 53
  },
- "run_id": "33654f83-59e44c"
+ "run_id": "efcff6d9-59e44c"
 }

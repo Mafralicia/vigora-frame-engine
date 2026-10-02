@@ -675,6 +675,28 @@ def _roof_sheet(sh: Sheet, res: Result, vnum: int):
     colors = {"T": sh.pal["primary"], "G": "#6D4C41", "D": "#C77D2E", "M": "#8E2A1C", "J": sh.pal["accent"],
               "V": "#1f6fb2", "A": "#2F6FA8"}
     _roof_lines(sh, res, V)
+    _posts = [(m.x0, m.z0) for m in res.members if m.role == "POST"]
+    if _posts:
+        res.stats["_center"] = (sum(p_[0] for p_ in _posts) / len(_posts), sum(p_[1] for p_ in _posts) / len(_posts))
+    for m in res.members:                         # varanda: vigas de beiral (contorno) e pilares (cheios)
+        if m.role == "EAVE_BEAM":
+            a, b = V.P(m.x0, m.z0), V.P(m.x1, m.z1)
+            sh.ax.add_patch(Rectangle((min(a[0], b[0]), min(a[1], b[1])), abs(b[0] - a[0]), abs(b[1] - a[1]),
+                                      lw=0.35 * PT, ec="#7B3F1D", fc="#E9D3BF", zorder=7))
+            c = ((a[0] + b[0]) / 2, (a[1] + b[1]) / 2)
+            vert = abs(b[1] - a[1]) > abs(b[0] - a[0])
+            # rótulo ao longo da viga, do lado de fora do telhado (onde não há marcas de treliça)
+            out_ = 1 if (c[0] if vert else c[1]) > (V.P(*res.stats.get("_center", (0, 0)))[0 if vert else 1]) else -1
+            off = (abs(b[0] - a[0]) if vert else abs(b[1] - a[1])) / 2 + 1.6
+            tx, ty = (c[0] + out_ * off, c[1]) if vert else (c[0], c[1] + out_ * off)
+            sh.text(tx, ty, "VB 2×38×235", h=1.4, ha="center", va="center", kind="mono", color="#7B3F1D", z=9,
+                    mask=True, movable=True, rot=90 if vert else 0)
+        elif m.role == "POST":
+            c = V.P(m.x0, m.z0)
+            hw = 57 * V.k
+            sh.ax.add_patch(Rectangle((c[0] - hw, c[1] - 70 * V.k), 2 * hw, 140 * V.k, lw=0.3 * PT, ec="#3d1f0e",
+                                      fc="#7B3F1D", zorder=8))
+            sh.text(c[0] + hw + 1.0, c[1] - 2.2, "PILAR", h=1.3, ha="left", kind="mono", color="#3d1f0e", z=9, mask=True)
     for t in res.stats.get("tanks", []):          # caixa d'água em projeção: bacia tracejada + caixa + capacidade
         c = V.P(*t["center"])
         sh.ax.add_patch(Circle(c, t["R_tray"] * V.k, lw=0.3 * PT, ec="#2F6FA8", fc="none", ls=(0, (4, 2)), zorder=8))

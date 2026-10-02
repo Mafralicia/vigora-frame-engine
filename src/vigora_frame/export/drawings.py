@@ -20,7 +20,7 @@ from matplotlib.patches import Rectangle
 from ..model import Result
 
 A3 = (16.54, 11.69)
-COLORS = {"TANK_BEAM": "#7B3F1D", "WATER_TANK": "#2F6FA8", "TANK_TRAY": "#9EC5E4", "TANK_DECK": "#C9A36B",
+COLORS = {"POST": "#7B3F1D", "EAVE_BEAM": "#9C5A2E", "TANK_BEAM": "#7B3F1D", "WATER_TANK": "#2F6FA8", "TANK_TRAY": "#9EC5E4", "TANK_DECK": "#C9A36B",
           "LEDGER": "#8D6E63", 
     "BOTTOM_PLATE": "#8d6e63", "TOP_PLATE": "#8d6e63", "CAP_PLATE": "#bcaaa4",
     "STUD": "#f3d9a4", "STUD_END": "#e0b96a", "SHEET_STUD": "#f7e2b8", "NAILER": "#f7e2b8", "BACKER": "#d8a657",

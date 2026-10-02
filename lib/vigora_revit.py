@@ -101,11 +101,35 @@ def extrair_bruto(doc):
                 raw["stairs"].append(d)
     except Exception:
         pass
+    raw["columns"] = []
     for fi in DB.FilteredElementCollector(doc).OfClass(DB.FamilyInstance).WhereElementIsNotElementType():
         d = _caixa(doc, fi)
         if d:
             raw["tanks"].append(d)
+            continue
+        d = _pilar(doc, fi)
+        if d:
+            raw["columns"].append(d)
     return raw
+
+
+def _pilar(doc, fi):
+    """Pilar arquitetônico (OST_Columns) ou estrutural (OST_StructuralColumns): ponto e altura pela caixa envolvente."""
+    try:
+        cat = rid(fi.Category.Id)
+    except Exception:
+        return None
+    if cat not in (int(DB.BuiltInCategory.OST_Columns), int(DB.BuiltInCategory.OST_StructuralColumns)):
+        return None
+    if getattr(fi, "SuperComponent", None) is not None or fi.Location is None or not hasattr(fi.Location, "Point"):
+        return None
+    bb = fi.get_BoundingBox(None)
+    if bb is None:
+        return None
+    lv = doc.GetElement(fi.LevelId)
+    base = lv.Elevation if lv is not None else bb.Min.Z
+    return {"rid": rid(fi.Id), "level_rid": rid(fi.LevelId), "point": _xy(fi.Location.Point),
+            "height": round(_mm(bb.Max.Z - max(base, bb.Min.Z)), 1)}
 
 
 def _parede(doc, w):
@@ -182,7 +206,7 @@ def _telhado(doc, r):
                 v = r.get_SlopeAngle(mc)          # CONFIRMAR NO 1º TESTE: tangente (subida/percurso)
                 ang = math.degrees(math.atan(v))
             edges.append({"p0": _xy(cv.GetEndPoint(0)), "p1": _xy(cv.GetEndPoint(1)), "slope": slope,
-                          "angle_deg": round(ang, 3)})
+                          "angle_deg": round(ang, 3), "loop": i, "kind": cv.GetType().Name})
     return {"rid": rid(r.Id), "level_rid": rid(r.LevelId), "edges": edges,
             "base_offset": round(_mm(_param(r, DB.BuiltInParameter.ROOF_LEVEL_OFFSET_PARAM, 0.0)), 1)}
 

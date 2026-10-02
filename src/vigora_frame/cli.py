@@ -31,6 +31,8 @@ def export_all(project_path: str, out: str, drawings: bool = True, formato: str 
     out_p.mkdir(parents=True, exist_ok=True)
     proj = load_project(project_path)
     res = run(proj)
+    from .clash import add_clash_issues
+    add_clash_issues(res)                       # toda peça contra toda peça, em 3D
     t_engine = time.time() - t0
     cat = Catalog.load()
     rules = Rules.load(proj.ruleset)
@@ -162,6 +164,8 @@ def revit_cmd(raw: str, config: str = typer.Option("", help="configuração do p
     (out_p / "projeto.json").write_text(proj.model_dump_json(indent=1), encoding="utf-8")
     if verificar:
         res = run(proj)
+        from .clash import add_clash_issues
+        add_clash_issues(res)
         pages = 0
     else:
         s = export_all(str(out_p / "projeto.json"), str(out_p), drawings=cfg.get("pranchas", True),

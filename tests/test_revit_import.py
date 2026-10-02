@@ -68,6 +68,8 @@ def fake_raw(p, rake=None, loc_line=0):
                               "top_level_rid": lv_rid[s.level],
                               "runs": [{"start": list(s.start), "end": [s.start[0] + d[0] * 4000, s.start[1] + d[1] * 4000],
                                         "width": s.width}]})
+    raw["columns"] = [{"rid": 96000 + i, "level_rid": lv_rid[c.level], "point": list(c.position), "height": c.height}
+                      for i, c in enumerate(p.posts)]
     for i, t in enumerate(p.tanks):
         raw["tanks"].append({"rid": 95000 + i, "level_rid": lv_rid[t.level], "model": t.model,
                              "point": list(t.position) if t.position else [0, 0], "auto": t.position is None})
@@ -82,7 +84,8 @@ def summary(r):
 @pytest.mark.parametrize("name", ["casa_terrea_wood", "casa_4aguas_wood", "casa_em_T_rincao", "casa_em_U_rincoes",
                                   "casa_meia_agua_parede_alta", "casa_platibanda", "sobrado_4aguas",
                                   "casa_caixa_dagua", "casa_meia_agua_steel_invertida", "casa_em_L_dois_telhados",
-                                  "casa_americana_4aguas_rincao", "salao_de_festas", "chale_40graus"])
+                                  "casa_americana_4aguas_rincao", "salao_de_festas", "chale_40graus",
+                                  "casa_varanda_pilares"])
 def test_round_trip_matches_original(name):
     p = load_project(ROOT / "examples" / f"{name}.json")
     ref = run(p)
@@ -332,3 +335,70 @@ def test_tee_over_opening_gives_one_clear_error_not_a_cascade():
                    "exterior": False, "bearing": False}]})
     errs = [i.code for i in run(p).issues if i.severity == "error"]
     assert errs == ["V-069"]
+
+
+def test_victor_model_conditions_template_walls_wing_overlap_and_dirty_main_sketch():
+    """Condições do modelo real: paredes do template (todas 'Exterior', nenhuma estrutural), asa com caimento
+    na ponta que entra no principal e esboço avançando sobre ele, principal com borda torta, chanfro e laço interno."""
+    import math as m
+    p = load_project(ROOT / "examples" / "casa_em_T_rincao.json")
+    ref = run(p)
+    raw = fake_raw(p)
+    for w in raw["walls"]:
+        w["type_function"], w["structural"] = "Exterior", False
+    main, wing = raw["roofs"][0], raw["roofs"][1]
+    # asa: ponta norte (y=0, encosta no principal) com caimento e avançando 1,5 m para dentro do principal
+    for e in wing["edges"]:
+        if abs(e["p0"][1] - e["p1"][1]) < 1 and abs(e["p0"][1]) < 1:
+            e["slope"], e["angle_deg"] = True, 25.0
+        for q in (e["p0"], e["p1"]):
+            if abs(q[1]) < 1:
+                q[1] = 1500.0
+    # principal: borda sul torta 0,5°, chanfro de 300 mm no canto NE, laço interno (abertura) no esboço
+    S = next(e for e in main["edges"] if abs(e["p0"][1] - e["p1"][1]) < 1 and e["p0"][1] < 0)
+    L = abs(S["p1"][0] - S["p0"][0])
+    E = next(e for e in main["edges"] if abs(e["p0"][0] - e["p1"][0]) < 1 and e["p0"][0] > 5000)
+    S["p1"][1] += L * m.tan(m.radians(0.5))
+    E["p0"] = list(S["p1"])                                   # no Revit as linhas continuam conectadas
+    N = next(e for e in main["edges"] if abs(e["p0"][1] - e["p1"][1]) < 1 and e["p0"][1] > 3000)
+    cx, cy = E["p1"][0], E["p1"][1]
+    E["p1"] = [cx, cy - 300]
+    N["p0"] = [cx - 300, cy]
+    main["edges"].insert(main["edges"].index(E) + 1, {"p0": [cx, cy - 300], "p1": [cx - 300, cy], "slope": False,
+                                                       "angle_deg": 0.0})
+    for e in main["edges"]:
+        e["loop"] = 0
+    hole = [[4000, 3000], [5000, 3000], [5000, 4000], [4000, 4000]]
+    main["edges"] += [{"p0": a, "p1": b, "slope": False, "angle_deg": 0.0, "loop": 1}
+                      for a, b in zip(hole, hole[1:] + hole[:1])]
+    proj, notes = normalize(raw, {"system": p.system})
+    assert not [n for n in notes if n["severity"] == "error"], [n["message"] for n in notes]
+    got = run(proj)
+    assert not [i for i in got.issues if i.code in ("V-080", "V-095")]
+    assert summary(got) == summary(ref)
+
+
+
+def test_porch_on_posts_eave_beams_at_wall_top():
+    r = run(load_project(ROOT / "examples" / "casa_varanda_pilares.json"))
+    assert not [i for i in r.issues if i.severity == "error"]
+    assert sum(1 for m in r.members if m.role == "POST") == 4
+    assert sum(1 for m in r.members if m.role == "EAVE_BEAM") == 2
+    z = {round(v["origin"][2]) for k, v in r.stats["placements"].items()
+         if "-R2-TR" in k and not any(m.parent == k and "marca V" in m.note for m in r.members)}
+    assert z == {2700}                                     # treliças comuns no topo da viga = topo das paredes
+
+
+def test_roof_edge_without_wall_or_posts_is_reported_per_edge():
+    p = load_project(ROOT / "examples" / "casa_varanda_pilares.json")
+    p.posts = [q for q in p.posts if q.position[0] < 4000]          # tira os pilares de um lado
+    errs = [i.message for i in run(p).issues if i.code == "V-080"]
+    assert len(errs) == 1 and "linha x" in errs[0]
+
+
+def test_post_span_limit():
+    p = load_project(ROOT / "examples" / "casa_varanda_pilares.json")
+    p.roofs[1].outline = [(2400.0, -4400.0), (6000.0, -4400.0), (6000.0, 0.0), (2400.0, 0.0)]   # varanda de 4,4 m
+    p.posts = [q.model_copy(update={"position": (q.position[0], -4330.0)}) if q.position[1] < -1000 else q
+               for q in p.posts]                                                            # pilares a 3,73 m
+    assert any(i.code == "V-089" and "acrescente um pilar" in i.message for i in run(p).issues)

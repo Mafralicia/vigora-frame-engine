@@ -1069,14 +1069,25 @@ def _cap_plates(wf: WallFrame, ctx: Ctx):
     stock = max(ctx.cat.stock_lengths(wf.plate))
     a, b = 0.0, wf.L
     js, je = wf.junc.start, wf.junc.end
+
+    def lap_end(e_):
+        """Transpasse sobre a parede encontrada; num cruzamento (X dividido em dois T) cada metade vai só até o eixo."""
+        if e_.kind == "tee" and e_.other:
+            wo = next((w_ for w_ in ctx.wall_frames.values() if w_.wall.id == e_.other), None)
+            if wo is not None:
+                for tp, _, oid in wo.tees:          # cruzamento: o encontro é registrado como "A+B"
+                    ids_ = oid.split("+")
+                    if wf.wall.id in ids_ and len(ids_) > 1:
+                        return e_.other_depth / 2
+        return e_.other_depth
     if js.kind == "through":
         a += js.other_depth
     elif js.kind in ("butt", "tee"):
-        a -= js.other_depth
+        a -= lap_end(js)
     if je.kind == "through":
         b -= je.other_depth
     elif je.kind in ("butt", "tee"):
-        b += je.other_depth
+        b += lap_end(je)
     intervals = [(a, b)]
     for tp, tw, _ in wf.tees:
         new = []

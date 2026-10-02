@@ -394,3 +394,28 @@ def casa_caixa_dagua(model="BR_1000L", position=None):
 if __name__ == "__main__":
     (HERE / "casa_caixa_dagua.json").write_text(json.dumps(casa_caixa_dagua(), indent=1, ensure_ascii=False), encoding="utf-8")
     print("ok casa_caixa_dagua")
+
+
+# ============================================================ varanda em pilares
+def casa_varanda_pilares():
+    """Casa 8,4 × 6,0 m, 2 águas 30°, com varanda de 3,6 × 2,4 m na frente: 2 águas perpendicular (rincão
+    no principal), bordas apoiadas em 4 pilares + vigas de beiral."""
+    H = 2700
+    walls = rect("E", "L1", 0, 0, 8400, 6000, H, ops={
+        "S": [win("J1", 600, 1200, 1200, 1000), door("P1", 2900, 900), win("J2", 6400, 1200, 1200, 1000)],
+        "N": [win("J3", 1500, 1200, 1200, 1000), win("J4", 5500, 1200, 1200, 1000)]})
+    walls += [iw("I1", "L1", (4200, 70), (4200, 5930), H, ops=[door("P2", 2500, 800)])]
+    h_post = H - 235.0
+    posts = [{"id": f"PL{i}", "level": "L1", "position": [x, y], "height": h_post}
+             for i, (x, y) in enumerate([(2470, -2330), (2470, -600), (5930, -2330), (5930, -600)], 1)]
+    roofs = [{"id": "R1", "level": "L1", "kind": "gable", "ridge_axis": "x", "pitch_deg": 30,
+              "outline": [[0, 0], [8400, 0], [8400, 6000], [0, 6000]]},
+             {"id": "R2", "level": "L1", "kind": "gable", "ridge_axis": "y", "pitch_deg": 30, "ends": ["gable", "valley"],
+              "outline": [[2400, -2400], [6000, -2400], [6000, 0], [2400, 0]]}]
+    return proj("CT17", "Casa com varanda em pilares", "wood", L1, walls, roofs=roofs) | {"posts": posts}
+
+
+if __name__ == "__main__":
+    (HERE / "casa_varanda_pilares.json").write_text(json.dumps(casa_varanda_pilares(), indent=1, ensure_ascii=False),
+                                                    encoding="utf-8")
+    print("ok casa_varanda_pilares")

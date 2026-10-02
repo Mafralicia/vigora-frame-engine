@@ -23,6 +23,7 @@ class Ctx:
     stairs: list = field(default_factory=list)
     roof_info: dict = field(default_factory=dict)
     wall_upper: dict = field(default_factory=dict)
+    post_lines: dict = field(default_factory=dict)     # linhas de pilares já criadas (varandas)
     tank_zones: list = field(default_factory=list)     # envelopes de caixa d'água (o telhado desvia)
     tanks: list = field(default_factory=list)        # parede -> altura do painel de complemento
     issues: list[Issue] = field(default_factory=list)

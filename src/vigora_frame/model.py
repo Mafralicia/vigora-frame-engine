@@ -95,6 +95,14 @@ class ColumnSpec(BaseModel):
     load_kPa: Optional[float] = None
 
 
+class PostSpec(BaseModel):
+    """Pilar de varanda/alpendre (do Revit: pilar arquitetônico ou estrutural). Apoia a viga de beiral."""
+    id: str
+    level: str
+    position: tuple[float, float]
+    height: float                         # do piso do nível ao topo do pilar (mm)
+
+
 class StairSpec(BaseModel):
     id: str
     level: str                            # pavimento de chegada (o piso que tem o vão)
@@ -127,6 +135,7 @@ class Project(BaseModel):
     floors: list[FloorSpec] = []
     roofs: list[RoofSpec] = []
     columns: list[ColumnSpec] = []
+    posts: list[PostSpec] = []
     stairs: list[StairSpec] = []
     tanks: list[TankSpec] = []
     meta: dict = {}          # cliente, local, responsável técnico, CREA, ART, verificação, data

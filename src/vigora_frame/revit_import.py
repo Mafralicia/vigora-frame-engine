@@ -26,7 +26,8 @@ HINTS = {
     "V-069": "Afaste a porta/janela do encontro em T (a parede que chega não pode cair sobre a abertura).",
     "V-018": "Afaste a abertura pelo menos 100 mm do canto.",
     "V-019": "Aberturas muito próximas: afaste ou una as duas em uma só.",
-    "V-080": "O telhado precisa de paredes portantes (estruturais) nas bordas com caimento.",
+    "V-080": "Marque como estruturais (botão Paredes/Tipos de parede) as paredes sob as bordas com caimento. "
+             "Cobertura apoiada só em pilares (varanda) ainda não é suportada.",
     "V-076": "As paredes de apoio do telhado/entrepiso precisam ter a mesma altura.",
     "V-086": "Aumente a altura da parede alta/platibanda para cobrir o telhado.",
     "V-088": "A cumeeira da asa precisa ficar abaixo da cumeeira do telhado principal.",
@@ -36,6 +37,7 @@ HINTS = {
     "V-085": "A escada bate em uma parede: mova a escada ou a parede.",
     "V-095": "Desenhe um telhado por volume, retangular e alinhado aos eixos do projeto.",
     "V-096": "Escada em lance reto alinhada aos eixos; escadas em L/U ainda não são suportadas.",
+    "V-060": "Duas peças ocupando o mesmo espaço: revise o encontro indicado (ou mande o modelo para análise).",
     "V-121": "Correção automática pequena (até 5 mm). Para eliminar, una as paredes no Revit.",
     "V-128": "Apague a parede duplicada no Revit.",
     "V-130": "Parede de comprimento zero: apague no Revit.",
@@ -117,19 +119,25 @@ def normalize(raw: dict, cfg: dict | None = None) -> tuple[Project, list]:
                         "height": round(ins["height"], 1), "sill": round(ins.get("sill", 0.0), 1)})
         item = {"id": wid, "level": lv_id[w["level_rid"]], "start": [round(p0[0], 1), round(p0[1], 1)],
                 "end": [round(p1[0], 1), round(p1[1], 1)], "height": round(w["height"], 1), "exterior": ext,
-                "bearing": bear, "openings": ops}
+                "bearing": bear, "openings": ops,
+                "_ext_fixed": "exterior" in ov or "exterior" in wt, "_bear_fixed": "bearing" in ov or "bearing" in wt,
+                "_structural": bool(w.get("structural", False)), "_width": w.get("width", 140.0)}
         if ov.get("wall_type") or wt.get("wall_type"):
             item["wall_type"] = ov.get("wall_type") or wt.get("wall_type")
         walls.append(item)
 
     heal_walls(walls, {("W%d" % w["rid"]): w.get("width", 140.0) for w in raw.get("walls", [])}, notes,
                centered={("W%d" % w["rid"]) for w in raw.get("walls", []) if int(w.get("location_line", 0)) in (0, 1)})
+    classify_walls(walls, notes, by_geometry=cfg.get("exterior_by_geometry", True))
+    for w in walls:
+        for k_ in ("_ext_fixed", "_bear_fixed", "_structural", "_width"):
+            w.pop(k_, None)
 
     def faces(level_id, axis):
         """Faces externas das paredes externas: (coordenada, extensão) para 'x' (paredes ao longo de x)."""
         out = []
         for w in walls:
-            if w["level"] != level_id or not w["exterior"]:
+            if w["level"] != level_id or not (w["exterior"] or w["bearing"]):
                 continue
             (x0, y0), (x1, y1) = w["start"], w["end"]
             along_x = abs(y1 - y0) < 1.0
@@ -138,6 +146,11 @@ def normalize(raw: dict, cfg: dict | None = None) -> tuple[Project, list]:
                 c_ = y0 if axis == "x" else x0
                 e0, e1 = sorted((x0, x1) if axis == "x" else (y0, y1))
                 out.append((c_, e0, e1))
+        for pst in posts:                         # pilares de varanda também definem a borda do telhado
+            if host_level(pst["level"]) != level_id:
+                continue
+            x_, y_ = pst["position"]
+            out.append((y_, x_ - 60, x_ + 60) if axis == "x" else (x_, y_ - 60, y_ + 60))
         return out
 
     # espessura do quadro da parede externa (das regras) para achar as faces externas
@@ -159,6 +172,14 @@ def normalize(raw: dict, cfg: dict | None = None) -> tuple[Project, list]:
         below = [l for l in wall_levels if lv_elev[l] <= lv_elev[lid] + 1]
         return max(below, key=lambda l: lv_elev[l]) if below else lid
 
+    # ---------------- pilares (varandas): pilar arquitetônico ou estrutural do Revit
+    posts = []
+    for c in raw.get("columns", []):
+        if c["level_rid"] not in lv_id or c.get("height", 0) < 500:
+            continue
+        posts.append({"id": "PL%d" % c["rid"], "level": host_level(lv_id[c["level_rid"]]),
+                      "position": [round(c["point"][0], 1), round(c["point"][1], 1)], "height": round(c["height"], 1)})
+
     # ---------------- telhados (telhado por perímetro): tipo pelas bordas com caimento
     fx_cache = {}
     roofs = []
@@ -171,17 +192,21 @@ def normalize(raw: dict, cfg: dict | None = None) -> tuple[Project, list]:
         if lvl != lvl_raw:
             _issue(notes, "V-000", "info", rid, "telhado desenhado no nível %s apoiado nas paredes do nível %s"
                    % (lvl_raw, lvl), [r["rid"]])
-        edges = _merge_edges(r.get("edges", []))
+        edges, fixes = _clean_loop(r.get("edges", []))
+        if fixes:
+            _issue(notes, "V-000", "info", rid, "contorno do telhado ajustado: " + "; ".join(fixes), [r["rid"]])
+        edges = _merge_edges(edges)
         n_sl = sum(1 for e in edges if e.get("slope"))
         axis_ok = edges and all(abs(e["p0"][0] - e["p1"][0]) < 1 or abs(e["p0"][1] - e["p1"][1]) < 1 for e in edges)
         if not axis_ok:
-            _issue(notes, "V-095", "error", rid, "telhado girado ou com bordas inclinadas em planta (%d bordas, %d com "
-                                                 "caimento): alinhe aos eixos do projeto" % (len(edges), n_sl), [r["rid"]])
+            _issue(notes, "V-095", "error", rid, "telhado com borda fora dos eixos em planta (%d bordas, %d com caimento). "
+                                                 "Vértices: %s" % (len(edges), n_sl, _verts_txt(edges)), [r["rid"]])
             continue
         parts = _rect_parts(edges)
         if not parts:
             _issue(notes, "V-095", "error", rid, "formato do telhado não suportado (%d bordas, %d com caimento): use "
-                                                 "retângulos, L, T ou U" % (len(edges), n_sl), [r["rid"]])
+                                                 "retângulos, L, T ou U. Vértices: %s" % (len(edges), n_sl, _verts_txt(edges)),
+                   [r["rid"]])
             continue
         fx = faces(lvl, "x")
         fy = faces(lvl, "y")
@@ -224,6 +249,53 @@ def normalize(raw: dict, cfg: dict | None = None) -> tuple[Project, list]:
         if len(made) > 1:
             _issue(notes, "V-000", "info", rid, "telhado em %d partes (formato L/T/U): principal + asa(s) com rincão"
                    % len(made), [r["rid"]])
+
+    # asas desenhadas avançando sobre o telhado principal: corta na linha do beiral do principal
+    for a in roofs:
+        if a["kind"] != "gable":
+            continue
+        ax = a["ridge_axis"]
+        (ax0, ay0), (ax1, ay1) = a["outline"][0], a["outline"][2]
+        a_al = [ax0, ax1] if ax == "x" else [ay0, ay1]
+        a_sp = (ay0, ay1) if ax == "x" else (ax0, ax1)
+        for b in roofs:
+            if b is a or b["level"] != a["level"] or b["ridge_axis"] == ax:
+                continue
+            (bx0, by0), (bx1, by1) = b["outline"][0], b["outline"][2]
+            b_sp = (bx0, bx1) if ax == "x" else (by0, by1)          # vão do principal no eixo da asa
+            b_al = (by0, by1) if ax == "x" else (bx0, bx1)
+            if min(a_sp[1], b_al[1]) - max(a_sp[0], b_al[0]) < 0.8 * (a_sp[1] - a_sp[0]):
+                continue
+            if a_al[0] < b_sp[0] - 5 < a_al[1] - 5 and a_al[1] > b_sp[0] + 5 and a_al[0] < b_sp[0]:
+                if a_al[1] - b_sp[0] < 0.5 * (a_al[1] - a_al[0]):
+                    a_al[1] = b_sp[0]
+            elif a_al[1] > b_sp[1] + 5 and a_al[0] < b_sp[1] - 5 and a_al[1] > b_sp[1]:
+                if b_sp[1] - a_al[0] < 0.5 * (a_al[1] - a_al[0]):
+                    a_al[0] = b_sp[1]
+        if ax == "x":
+            ax0, ax1 = a_al
+        else:
+            ay0, ay1 = a_al
+        a["outline"] = [[ax0, ay0], [ax1, ay0], [ax1, ay1], [ax0, ay1]]
+    for a in list(roofs):                                        # ponta com caimento precisa encostar em outro telhado
+        o = a.pop("_hip_end", None)
+        if not o:
+            continue
+        (ax0, ay0), (ax1, ay1) = a["outline"][0], a["outline"][2]
+        fc = {"S": ay0, "N": ay1, "W": ax0, "E": ax1}[o]
+        ok = False
+        for b in roofs:
+            if b is a or b["level"] != a["level"]:
+                continue
+            (bx0, by0), (bx1, by1) = b["outline"][0], b["outline"][2]
+            if o in ("S", "N") and by0 - 5 <= fc <= by1 + 5 and min(ax1, bx1) - max(ax0, bx0) > 100:
+                ok = True
+            if o in ("W", "E") and bx0 - 5 <= fc <= bx1 + 5 and min(ay1, by1) - max(ay0, by0) > 100:
+                ok = True
+        if not ok:
+            _issue(notes, "V-095", "error", a["id"], "caimento em 3 bordas (2 águas com uma ponta em 4 águas) ainda não "
+                                                     "suportado: tire o caimento da borda %s" % o, [])
+            roofs.remove(a)
 
     # parede alta automática (meia-água cujo lado alto tem paredes mais altas)
     for spec in roofs:
@@ -332,7 +404,7 @@ def normalize(raw: dict, cfg: dict | None = None) -> tuple[Project, list]:
     proj = Project.model_validate({
         "id": cfg.get("project_id", "RVT"), "name": raw.get("doc", {}).get("title", "Modelo Revit"),
         "system": system, "ruleset": ruleset, "levels": levels, "walls": walls, "curved_walls": curved,
-        "roofs": roofs, "floors": floors, "stairs": stairs, "tanks": tanks, "meta": meta})
+        "roofs": roofs, "floors": floors, "stairs": stairs, "tanks": tanks, "posts": posts, "meta": meta})
     for r in proj.roofs:
         spc = dict(cfg.get("roof_defaults", {}))
         pref = spc.pop("truss_type", None)
@@ -342,6 +414,48 @@ def normalize(raw: dict, cfg: dict | None = None) -> tuple[Project, list]:
             if v not in (None, "", "auto") and getattr(r, k_, None) in (None, "") and k_ != "outline":
                 setattr(r, k_, v)
     return proj, notes
+
+
+def classify_walls(walls, notes=None, by_geometry=True):
+    """Externa = está no perímetro do conjunto de paredes (geometria), não o 'tipo' do Revit (templates marcam
+    tudo como Exterior). Portante = estrutural no Revit OU externa. Escolhas do usuário (botões) vencem."""
+    from shapely.geometry import LineString, Point
+    from shapely.ops import unary_union
+    changed_ext, changed_bear = 0, 0
+    for lvl in sorted({w["level"] for w in walls}):
+        ws = [w for w in walls if w["level"] == lvl]
+        bands = [LineString([tuple(w["start"]), tuple(w["end"])]).buffer(w.get("_width", 140.0) / 2 + 2, cap_style=2,
+                                                                             join_style=2) for w in ws]
+        U = unary_union(bands)
+        polys = [U] if U.geom_type == "Polygon" else list(getattr(U, "geoms", []))
+        for w in ws:
+            ext_geo = w["exterior"]
+            if by_geometry and polys:
+                (x0, y0), (x1, y1) = w["start"], w["end"]
+                L = math.hypot(x1 - x0, y1 - y0)
+                n = max(3, int(L / 400))
+                hw = w.get("_width", 140.0) / 2
+                ring = None
+                for pg in polys:
+                    if pg.distance(Point((x0 + x1) / 2, (y0 + y1) / 2)) < 1:
+                        ring = pg.exterior
+                        break
+                if ring is not None:
+                    hits = sum(1 for k in range(n) if ring.distance(Point(x0 + (x1 - x0) * (k + 0.5) / n,
+                                                                         y0 + (y1 - y0) * (k + 0.5) / n)) <= hw + 30)
+                    ext_geo = hits >= 0.25 * n                 # basta um trecho relevante no perímetro
+            if not w.get("_ext_fixed") and ext_geo != w["exterior"]:
+                w["exterior"] = ext_geo
+                changed_ext += 1
+            if not w.get("_bear_fixed"):
+                bear = w.get("_structural", False) or w["exterior"]
+                if bear != w["bearing"]:
+                    changed_bear += 1
+                w["bearing"] = bear
+    if notes is not None and (changed_ext or changed_bear):
+        _issue(notes, "V-000", "info", "paredes",
+               "%d parede(s) reclassificada(s) como externa/interna pela posição no perímetro; %d com função portante "
+               "ajustada (externas são portantes; internas só se marcadas como estruturais)" % (changed_ext, changed_bear))
 
 
 def _line_inter(p0, p1, q0, q1):
@@ -443,6 +557,78 @@ def _move_end(w, end, X):
     w[end] = [X[0], X[1]]
 
 
+def _verts_txt(edges, nmax=10):
+    v = ["(%.0f,%.0f)%s" % (e["p0"][0], e["p0"][1], "*" if e.get("slope") else "") for e in edges[:nmax]]
+    return " ".join(v) + (" …" if len(edges) > nmax else "") + "  (* = borda com caimento)"
+
+
+def _clean_loop(edges, snap_deg=2.0, max_chamfer=1500.0):
+    """Contorno limpo do telhado: só o maior laço, bordas encadeadas, quase-alinhadas endireitadas (<= 2°),
+    chanfros curtos removidos (as bordas vizinhas são prolongadas até o canto). Retorna (bordas, ajustes)."""
+    fixes = []
+    if not edges:
+        return [], fixes
+    loops = {}
+    for e in edges:
+        loops.setdefault(e.get("loop", 0), []).append(dict(e))
+    if len(loops) > 1:
+        def area(lp):
+            pts = [q["p0"] for q in lp]
+            return abs(_area(pts))
+        main = max(loops.values(), key=area)
+        fixes.append("%d laço(s) interno(s) do esboço ignorado(s) (aberturas no telhado)" % (len(loops) - 1))
+    else:
+        main = list(loops.values())[0]
+    # encadeia (o Revit pode inverter o sentido de algumas linhas)
+    rest = main[1:]
+    chain = [main[0]]
+    while rest:
+        end = chain[-1]["p1"]
+        k = next((i for i, q in enumerate(rest) if _dist(q["p0"], end) < 2 or _dist(q["p1"], end) < 2), None)
+        if k is None:
+            break
+        q = rest.pop(k)
+        if _dist(q["p0"], end) >= 2:
+            q["p0"], q["p1"] = q["p1"], q["p0"]
+        chain.append(q)
+    if rest:
+        return main, fixes                                     # não fecha: deixa a verificação acusar
+    # endireita bordas quase alinhadas aos eixos
+    straightened = 0
+    for e in chain:
+        dx, dy = e["p1"][0] - e["p0"][0], e["p1"][1] - e["p0"][1]
+        L = math.hypot(dx, dy)
+        if L < 1:
+            continue
+        ang = math.degrees(math.atan2(abs(dy), abs(dx)))
+        if 0.05 < ang <= snap_deg:
+            y = (e["p0"][1] + e["p1"][1]) / 2
+            e["p0"], e["p1"] = [e["p0"][0], y], [e["p1"][0], y]
+            straightened += 1
+        elif 0.05 < 90 - ang <= snap_deg:
+            x = (e["p0"][0] + e["p1"][0]) / 2
+            e["p0"], e["p1"] = [x, e["p0"][1]], [x, e["p1"][1]]
+            straightened += 1
+    if straightened:
+        fixes.append("%d borda(s) quase alinhada(s) endireitada(s) (até %.0f°)" % (straightened, snap_deg))
+    # recompõe vértices pela interseção das bordas vizinhas; remove chanfros curtos
+    n = len(chain)
+    is_axis = [abs(e["p0"][0] - e["p1"][0]) < 0.5 or abs(e["p0"][1] - e["p1"][1]) < 0.5 for e in chain]
+    keep = [i for i in range(n) if is_axis[i] or _dist(chain[i]["p0"], chain[i]["p1"]) > max_chamfer]
+    removed = n - len(keep)
+    if removed and len(keep) >= 4:
+        chain = [chain[i] for i in keep]
+        fixes.append("%d chanfro(s) de canto removido(s)" % removed)
+    m = len(chain)
+    for i in range(m):
+        a, b = chain[i], chain[(i + 1) % m]
+        X = _line_inter(a["p0"], a["p1"], b["p0"], b["p1"])
+        if X is not None:
+            a["p1"] = [round(X[0], 1), round(X[1], 1)]
+            b["p0"] = [round(X[0], 1), round(X[1], 1)]
+    return chain, fixes
+
+
 def _rect_parts(edges):
     """Divide o contorno ortogonal do telhado em retângulos (1 para retângulo; 2+ para L, T, U).
 
@@ -535,6 +721,15 @@ def _rect_roof(rid, lvl, part, fx, fy, wall_depth, r, notes):
     elif sl in ({"S", "N"}, {"W", "E"}):
         spec["kind"] = "gable"
         spec["ridge_axis"] = "x" if sl == {"S", "N"} else "y"
+    elif len(sl) == 3:
+        # o Revit marca caimento em toda borda: a ponta que entra no telhado principal costuma ficar marcada
+        u = ({"S", "N", "W", "E"} - sl).pop()
+        o = {"S": "N", "N": "S", "W": "E", "E": "W"}[u]
+        spec["kind"] = "gable"
+        spec["ridge_axis"] = "y" if u in ("S", "N") else "x"
+        spec["_hip_end"] = o
+        pitch = [v["angle_deg"] for k, v in sides.items() if v["slope"] and not v["internal"] and k != o]
+        spec["pitch_deg"] = round(sum(pitch) / len(pitch), 2) if pitch else spec["pitch_deg"]
     elif len(sl) == 1:
         s_ = next(iter(sl))
         spec["kind"] = "mono"
@@ -547,7 +742,12 @@ def _rect_roof(rid, lvl, part, fx, fy, wall_depth, r, notes):
         return None
     hd = wall_depth / 2
 
-    def side(val, axis_list, outward):
+    def side(val, axis_list, outward, lo, hi):
+        # só paredes/pilares ao longo desta borda do telhado (não outra parede na mesma linha, em outro trecho)
+        axis_list = [q for q in axis_list if min(q[2], hi) - max(q[1], lo) > min(100.0, 0.25 * (hi - lo))]
+        for c_, e0, e1 in axis_list:                     # 1º: borda encostada na face de outra parede/volume
+            if abs((c_ - outward * hd) - val) < 5 and (c_ - val) * outward > 0:
+                return val, True
         best = None
         for c_, e0, e1 in axis_list:
             face_out = c_ + outward * hd                 # face externa de uma parede neste lado
@@ -561,10 +761,10 @@ def _rect_roof(rid, lvl, part, fx, fy, wall_depth, r, notes):
                 return val, True
         return val, False
 
-    oy0, t_s = (by0, False) if sides["S"]["internal"] else side(by0, fx, -1)
-    oy1, t_n = (by1, False) if sides["N"]["internal"] else side(by1, fx, 1)
-    ox0, t_w = (bx0, False) if sides["W"]["internal"] else side(bx0, fy, -1)
-    ox1, t_e = (bx1, False) if sides["E"]["internal"] else side(bx1, fy, 1)
+    oy0, t_s = (by0, False) if sides["S"]["internal"] else side(by0, fx, -1, bx0, bx1)
+    oy1, t_n = (by1, False) if sides["N"]["internal"] else side(by1, fx, 1, bx0, bx1)
+    ox0, t_w = (bx0, False) if sides["W"]["internal"] else side(bx0, fy, -1, by0, by1)
+    ox1, t_e = (bx1, False) if sides["E"]["internal"] else side(bx1, fy, 1, by0, by1)
     if t_s and t_n and t_w and t_e:                      # telhado desenhado por dentro das paredes = platibanda
         oy0, oy1, ox0, ox1 = by0 - wall_depth, by1 + wall_depth, bx0 - wall_depth, bx1 + wall_depth
         spec["support"] = "parapet"
@@ -574,8 +774,7 @@ def _rect_roof(rid, lvl, part, fx, fy, wall_depth, r, notes):
             if spec["ridge_axis"] == "x" else \
             [ox0 - bx0 if not sides["W"]["internal"] else 0, bx1 - ox1 if not sides["E"]["internal"] else 0]
         ovh = max([v for v in eave if v > 5] or [0.0])
-        if ovh > 0:
-            spec["overhang"] = round(ovh, 1)
+        spec["overhang"] = round(ovh, 1)              # beiral zero também é informação (não usar o padrão)
     spec["outline"] = [[ox0, oy0], [ox1, oy0], [ox1, oy1], [ox0, oy1]]
     return spec
 

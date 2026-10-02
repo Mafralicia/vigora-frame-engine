@@ -451,6 +451,21 @@ def frame_roof(rs: RoofSpec, ctx: Ctx, wall_frames: list) -> None:
         ovh = 0.0
     else:
         bearing = [w_ for w_ in walls_on_face(low_face) if w_.wall.bearing]
+        tops_extra, missing = [], []
+        from .posts import post_line_support
+
+        def face_support(face_, inward_):
+            """Parede portante na borda; se não houver, linha de pilares + viga de beiral (varanda)."""
+            ws_ = [w_ for w_ in walls_on_face(face_) if w_.wall.bearing]
+            if ws_:
+                return ws_
+            h_ = post_line_support(ctx, rs, rid, rs.ridge_axis, face_, inward_, (o_along, o_along + Lr), lv_elev)
+            if h_ is not None:
+                tops_extra.append(h_)
+            else:
+                missing.append(face_)
+            return []
+        bearing = face_support(low_face, -1 if mono_flip else 1)
         if rs.support == "high_wall":
             if rs.kind != "mono":
                 ctx.issue("V-086", "error", rid, "parede alta só se aplica à meia-água")
@@ -461,13 +476,17 @@ def frame_roof(rs: RoofSpec, ctx: Ctx, wall_frames: list) -> None:
                 return
             S_in, hang = span - max(w_.depth for w_ in hw_), (False, True)
         else:
-            bearing += [w_ for w_ in walls_on_face(high_face) if w_.wall.bearing]
+            bearing += face_support(high_face, 1 if mono_flip else -1)
             if rs.kind == "hip":
                 bearing += [w_ for f_ in (o_along, o_along + Lr) for w_ in walls_on_face(f_, along_ridge=False)
                             if w_.wall.bearing]
-        tops = [w_.H for w_ in bearing]
+        tops = [w_.H for w_ in bearing] + tops_extra
+        if missing:
+            nome = "x" if rs.ridge_axis == "x" else "y"
+            ctx.issue("V-080", "error", rid, "borda do telhado sem apoio (" + ", ".join(
+                f"linha {'y' if nome == 'x' else 'x'} = {f_:.0f}" for f_ in missing) + "): falta parede portante ou "
+                "linha de pilares")
         if not tops:
-            ctx.issue("V-080", "error", rid, "cobertura sem paredes portantes de apoio")
             tops = [max((wf.H for wf in ext), default=2700)]
         if max(tops) - min(tops) > 1.0:
             ctx.issue("V-076", "error", rid, f"paredes de apoio com alturas diferentes ({min(tops):.0f} e {max(tops):.0f} mm)")
@@ -497,6 +516,9 @@ def frame_roof(rs: RoofSpec, ctx: Ctx, wall_frames: list) -> None:
         oys = [q[1] for q in other.outline]
         o_sp = (min(oys), max(oys)) if rs.ridge_axis == "x" else (min(oxs), max(oxs))
         o_al = (min(oxs), max(oxs)) if rs.ridge_axis == "x" else (min(oys), max(oys))
+        # a faixa cortada inclui o beiral da asa (senão o beiral dela bate nas treliças vizinhas do principal)
+        o_ovh = 0.0 if other.support == "parapet" else (other.overhang if other.overhang is not None else Rr["overhang"])
+        o_al = (o_al[0] - o_ovh, o_al[1] + o_ovh)
         if abs(o_sp[1] - o_span) < 1:
             cut["r" if mono_flip else "l"].append((o_al[0] - o_along, o_al[1] - o_along))
         if abs(o_sp[0] - (o_span + span)) < 1:
@@ -624,7 +646,10 @@ def frame_roof(rs: RoofSpec, ctx: Ctx, wall_frames: list) -> None:
         n_v = 0
         while True:
             q = face + dirv * u
-            base = main_surface(q)
+            # banzo inferior de 38 mm sobre água inclinada: apoia pela aresta alta (calço chanfrado na baixa),
+            # senão a metade de cima penetra o telhado principal
+            tv_ = cat.face(bot) / 2
+            base = max(main_surface(q - tv_), main_surface(q + tv_))
             Tv = dt_top / cosp                     # ponta afinada: banzo inferior chanfrado sob o superior
             v_a = (base + Tv - z_top - T0) / tanp
             span_v = span - 2 * v_a
@@ -637,7 +662,7 @@ def frame_roof(rs: RoofSpec, ctx: Ctx, wall_frames: list) -> None:
             n_v += 1
             u += sp
         ctx.issue("V-000", "info", rid, f"rincão: {n_v} treliças V sobre o telhado principal "
-                                        f"(banzo inferior chanfrado a {main['pitch']:.0f}° apoiado nas treliças de baixo)")
+                                        f"(apoio pela aresta alta do banzo inferior; calço chanfrado a {main['pitch']:.0f}° sobre as treliças de baixo)")
 
     ctx.roof_info[rid] = {"level": rs.level, "ridge_axis": rs.ridge_axis, "o_span": o_span, "span": span,
                           "o_along": o_along, "Lr": Lr, "z_top": z_top, "T0": T0, "tan": tanp, "kind": rs.kind,

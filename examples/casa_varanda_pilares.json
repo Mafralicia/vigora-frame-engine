@@ -1,0 +1,245 @@
+{
+ "id": "CT17",
+ "name": "Casa com varanda em pilares",
+ "system": "wood",
+ "ruleset": "wood-br-v1",
+ "levels": [
+  {
+   "id": "L1",
+   "name": "Térreo",
+   "elevation": 0,
+   "height": 2700
+  }
+ ],
+ "walls": [
+  {
+   "id": "ES",
+   "level": "L1",
+   "start": [
+    70.0,
+    70.0
+   ],
+   "end": [
+    8330.0,
+    70.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J1",
+     "kind": "window",
+     "offset": 600,
+     "width": 1200,
+     "height": 1200,
+     "sill": 1000
+    },
+    {
+     "id": "P1",
+     "kind": "door",
+     "offset": 2900,
+     "width": 900,
+     "height": 2100,
+     "sill": 0
+    },
+    {
+     "id": "J2",
+     "kind": "window",
+     "offset": 6400,
+     "width": 1200,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "EN",
+   "level": "L1",
+   "start": [
+    70.0,
+    5930.0
+   ],
+   "end": [
+    8330.0,
+    5930.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": [
+    {
+     "id": "J3",
+     "kind": "window",
+     "offset": 1500,
+     "width": 1200,
+     "height": 1200,
+     "sill": 1000
+    },
+    {
+     "id": "J4",
+     "kind": "window",
+     "offset": 5500,
+     "width": 1200,
+     "height": 1200,
+     "sill": 1000
+    }
+   ]
+  },
+  {
+   "id": "EW",
+   "level": "L1",
+   "start": [
+    70.0,
+    70.0
+   ],
+   "end": [
+    70.0,
+    5930.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": []
+  },
+  {
+   "id": "EE",
+   "level": "L1",
+   "start": [
+    8330.0,
+    70.0
+   ],
+   "end": [
+    8330.0,
+    5930.0
+   ],
+   "height": 2700,
+   "exterior": true,
+   "bearing": true,
+   "openings": []
+  },
+  {
+   "id": "I1",
+   "level": "L1",
+   "start": [
+    4200,
+    70
+   ],
+   "end": [
+    4200,
+    5930
+   ],
+   "height": 2700,
+   "exterior": false,
+   "bearing": false,
+   "openings": [
+    {
+     "id": "P2",
+     "kind": "door",
+     "offset": 2500,
+     "width": 800,
+     "height": 2100,
+     "sill": 0
+    }
+   ]
+  }
+ ],
+ "roofs": [
+  {
+   "id": "R1",
+   "level": "L1",
+   "kind": "gable",
+   "ridge_axis": "x",
+   "pitch_deg": 30,
+   "outline": [
+    [
+     0,
+     0
+    ],
+    [
+     8400,
+     0
+    ],
+    [
+     8400,
+     6000
+    ],
+    [
+     0,
+     6000
+    ]
+   ]
+  },
+  {
+   "id": "R2",
+   "level": "L1",
+   "kind": "gable",
+   "ridge_axis": "y",
+   "pitch_deg": 30,
+   "ends": [
+    "gable",
+    "valley"
+   ],
+   "outline": [
+    [
+     2400,
+     -2400
+    ],
+    [
+     6000,
+     -2400
+    ],
+    [
+     6000,
+     0
+    ],
+    [
+     2400,
+     0
+    ]
+   ]
+  }
+ ],
+ "floors": [],
+ "curved_walls": [],
+ "columns": [],
+ "stairs": [],
+ "posts": [
+  {
+   "id": "PL1",
+   "level": "L1",
+   "position": [
+    2470,
+    -2330
+   ],
+   "height": 2465.0
+  },
+  {
+   "id": "PL2",
+   "level": "L1",
+   "position": [
+    2470,
+    -600
+   ],
+   "height": 2465.0
+  },
+  {
+   "id": "PL3",
+   "level": "L1",
+   "position": [
+    5930,
+    -2330
+   ],
+   "height": 2465.0
+  },
+  {
+   "id": "PL4",
+   "level": "L1",
+   "position": [
+    5930,
+    -600
+   ],
+   "height": 2465.0
+  }
+ ]
+}

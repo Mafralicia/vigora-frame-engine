@@ -62,6 +62,17 @@ def revit_solids(res: Result) -> dict:
             wall_depth[m.parent.rsplit("-PN", 1)[0]] = m.depth
     pl = res.stats.get("placements", {})
     levels = res.stats.get("levels", {})
+    from types import SimpleNamespace
+    wall_clip = {}                          # parede -> origem, direção, comprimento e cortes das pontas
+    by_wall = {}
+    for p in res.panels:
+        by_wall.setdefault(p.id.rsplit("-PN", 1)[0], []).append(p)
+    for wid, ps in by_wall.items():
+        ps.sort(key=lambda p: p.x_start)
+        if wid in walls:
+            o, d = walls[wid]
+            wall_clip[wid] = SimpleNamespace(origin=o, direction=d, length=ps[-1].x_start + ps[-1].length,
+                                             clip_start=ps[0].clip_start, clip_end=ps[-1].clip_end)
     out = []
     for m in res.members:
         prof, ext = None, None
@@ -73,6 +84,17 @@ def revit_solids(res: Result) -> dict:
             if poly.is_empty or poly.area < 1:
                 continue
             z0 = pn_.origin[2] + m.z0
+            prof = [[x, y, z0] for x, y in list(poly.exterior.coords)[:-1]]
+            ext = [0.0, 0.0, max(m.z1 - m.z0, 1.0)]
+        elif (m.frame == "wall" and m.role == "CAP_PLATE" and m.parent in wall_clip
+              and (wall_clip[m.parent].clip_start or wall_clip[m.parent].clip_end)):
+            # placa de amarração na meia-esquadria: mesmo corte das peças dos painéis
+            wc = wall_clip[m.parent]
+            dep = wall_depth.get(m.parent, m.depth or 89.0)
+            poly = _clip_poly(wc, m.x0, m.x1, dep)
+            if poly.is_empty or poly.area < 1:
+                continue
+            z0 = wc.origin[2] + m.z0
             prof = [[x, y, z0] for x, y in list(poly.exterior.coords)[:-1]]
             ext = [0.0, 0.0, max(m.z1 - m.z0, 1.0)]
         elif m.frame in ("panel", "wall"):
@@ -112,11 +134,11 @@ def revit_solids(res: Result) -> dict:
             base = [o[0] + ac[0] * P_["off"], o[1] + ac[1] * P_["off"], o[2]]
             prof = [[base[0] + sd[0] * x, base[1] + sd[1] * x, base[2] + z] for x, z in m.polygon]
             ext = [ac[0] * P_["thick"], ac[1] * P_["thick"], 0.0]
-        elif m.frame == "plan" and m.group in ("floor", "tank") and m.parent in pl:
+        elif m.frame == "plan" and m.group in ("floor", "tank", "eave") and m.parent in pl:
             z = pl[m.parent]["z"]
             prof = [[m.x0, m.z0, z], [m.x1, m.z0, z], [m.x1, m.z1, z], [m.x0, m.z1, z]]
             ext = [0.0, 0.0, m.depth or 235.0]
-        elif m.role == "COLUMN":
+        elif m.role in ("COLUMN", "POST"):
             z = levels.get(m.level, {}).get("elevation", 0.0)
             h = 70.0
             prof = [[m.x0 - h, m.z0 - h, z], [m.x0 + h, m.z0 - h, z], [m.x0 + h, m.z0 + h, z], [m.x0 - h, m.z0 + h, z]]

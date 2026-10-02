@@ -8,7 +8,7 @@ from .engine.context import Ctx
 from .engine.walls import CLASH, MIN_CLEAR, TOUCH, VERTICAL, contact
 
 LINEAR_EXEMPT = {"ARCH_FILLER"}
-DEGREE_EXEMPT = {"CAP_PLATE", "BATTEN", "BC_RESTRAINT", "DIAG_BRACE", "COLUMN", "STRAP", "HIP_RAFTER", "STRINGER", "TREAD", "LEDGER", "TANK_BEAM"}
+DEGREE_EXEMPT = {"CAP_PLATE", "BATTEN", "BC_RESTRAINT", "DIAG_BRACE", "COLUMN", "STRAP", "HIP_RAFTER", "STRINGER", "TREAD", "LEDGER", "TANK_BEAM", "POST", "EAVE_BEAM"}
 
 
 def in_cut(voids, x, z) -> bool:
