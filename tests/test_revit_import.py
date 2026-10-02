@@ -234,3 +234,101 @@ def test_issue_lines_always_name_the_element():
     iss = issues_for_revit(run(proj), notes)
     assert all(i["message"].startswith("[") or not i["element"] or i["element"] in i["message"]
                for i in iss if i["severity"] == "error")
+
+
+def union_roof_raw(p, roof_level_on_top=False):
+    """Um único telhado do Revit com o formato de todas as partes juntas (L/T/U), beiral incluído no desenho."""
+    from shapely.geometry import Polygon
+    from shapely.ops import unary_union
+    raw = fake_raw(p)
+    rects, sloped_lines = [], []
+    for rr in raw["roofs"]:
+        xs = [q for e in rr["edges"] for q in (e["p0"][0], e["p1"][0])]
+        ys = [q for e in rr["edges"] for q in (e["p0"][1], e["p1"][1])]
+        rects.append(Polygon([(min(xs), min(ys)), (max(xs), min(ys)), (max(xs), max(ys)), (min(xs), max(ys))]))
+        sloped_lines += [e for e in rr["edges"] if e["slope"]]
+    U = unary_union(rects).simplify(0.5)
+    pts0 = list(U.exterior.coords)[:-1]
+    # no Revit o caimento é por linha do esboço: a linha é dividida onde o caimento muda (cantos das partes)
+    corners = {(round(x, 1), round(y, 1)) for rc in rects for x, y in list(rc.exterior.coords)[:-1]}
+    pts = []
+    for a, b in zip(pts0, pts0[1:] + pts0[:1]):
+        pts.append(a)
+        horiz = abs(a[1] - b[1]) < 1
+        lo, hi = sorted((a[0], b[0]) if horiz else (a[1], b[1]))
+        mids = sorted({(c[0] if horiz else c[1]) for c in corners
+                       if (abs(c[1] - a[1]) < 1 if horiz else abs(c[0] - a[0]) < 1) and lo + 1 < (c[0] if horiz else c[1]) < hi - 1},
+                      reverse=(b[0] < a[0]) if horiz else (b[1] < a[1]))
+        pts += [(m, a[1]) if horiz else (a[0], m) for m in mids]
+    edges = []
+    for a, b in zip(pts, pts[1:] + pts[:1]):
+        horiz = abs(a[1] - b[1]) < 1
+        sl = None
+        for e in sloped_lines:
+            if horiz and abs(e["p0"][1] - e["p1"][1]) < 1 and abs(e["p0"][1] - a[1]) < 1:
+                lo, hi = sorted((e["p0"][0], e["p1"][0]))
+                if min(a[0], b[0]) >= lo - 1 and max(a[0], b[0]) <= hi + 1:
+                    sl = e
+            if not horiz and abs(e["p0"][0] - e["p1"][0]) < 1 and abs(e["p0"][0] - a[0]) < 1:
+                lo, hi = sorted((e["p0"][1], e["p1"][1]))
+                if min(a[1], b[1]) >= lo - 1 and max(a[1], b[1]) <= hi + 1:
+                    sl = e
+        edges.append({"p0": list(a), "p1": list(b), "slope": sl is not None,
+                      "angle_deg": sl["angle_deg"] if sl else 0.0})
+    lvl = raw["roofs"][0]["level_rid"]
+    if roof_level_on_top:                                  # como no Revit: telhado no nível de cima (sem paredes)
+        top = max(l["elevation"] for l in raw["levels"]) + 2700.0
+        raw["levels"].append({"rid": 399, "name": "Cobertura", "elevation": top})
+        lvl = 399
+    raw["roofs"] = [{"rid": 71000, "level_rid": lvl, "edges": edges, "base_offset": 0.0}]
+    return raw
+
+
+@pytest.mark.parametrize("name", ["casa_em_T_rincao", "casa_em_U_rincoes", "casa_americana_4aguas_rincao"])
+def test_single_L_T_U_roof_is_split_into_main_and_wings(name):
+    p = load_project(ROOT / "examples" / f"{name}.json")
+    ref = run(p)
+    proj, notes = normalize(union_roof_raw(p), {"system": p.system})
+    assert not [n for n in notes if n["severity"] == "error"], notes
+    assert len(proj.roofs) == len(p.roofs)
+    got = run(proj)
+    assert summary(got) == summary(ref), name
+
+
+def test_roof_on_level_without_walls_bears_on_walls_below_and_ceiling_floor_is_ignored():
+    p = load_project(ROOT / "examples" / "casa_terrea_wood.json")
+    raw = union_roof_raw(p, roof_level_on_top=True)
+    raw["floors"] = [{"rid": 88000, "level_rid": 399, "loops": [[[0, 0], [8400, 0], [8400, 7000], [0, 7000]]]}]
+    proj, notes = normalize(raw, {})
+    assert proj.roofs[0].level == "L1" and not proj.floors
+    r = run(proj)
+    assert not [i for i in r.issues if i.code in ("V-080", "V-076")]
+    z = {round(v["origin"][2]) for k, v in r.stats["placements"].items() if "-TR" in k}
+    assert z == {2700}                                     # no topo das paredes, não flutuando
+    assert summary(r) == summary(run(p))
+
+
+def test_tank_subcomponents_count_as_one_tank_on_wall_level():
+    p = load_project(ROOT / "examples" / "casa_caixa_dagua.json")
+    raw = union_roof_raw(p, roof_level_on_top=True)
+    raw["tanks"] = [{"rid": 95000 + i, "level_rid": 399, "model": "BR_1000L", "point": [4200 + d, 4200], "auto": True}
+                    for i, d in enumerate((0, 400, -400, 90, 0))]
+    proj, notes = normalize(raw, {})
+    assert len(proj.tanks) == 1 and proj.tanks[0].level == "L1"
+    assert not [i for i in run(proj).issues if i.severity == "error"]
+
+
+def test_tee_over_opening_gives_one_clear_error_not_a_cascade():
+    from vigora_frame.model import Project
+    p = Project.model_validate({
+        "id": "T", "name": "t", "system": "wood", "ruleset": "wood-br-v1",
+        "levels": [{"id": "L1", "name": "T", "elevation": 0, "height": 2700}],
+        "walls": [{"id": "A", "level": "L1", "start": [0, 0], "end": [6000, 0], "height": 2700,
+                   "openings": [{"id": "J", "kind": "window", "offset": 2700, "width": 700, "height": 500, "sill": 1500}]},
+                  {"id": "C", "level": "L1", "start": [0, 0], "end": [0, 4000], "height": 2700},
+                  {"id": "N", "level": "L1", "start": [0, 4000], "end": [6000, 4000], "height": 2700},
+                  {"id": "E", "level": "L1", "start": [6000, 0], "end": [6000, 4000], "height": 2700},
+                  {"id": "B", "level": "L1", "start": [3000, 0], "end": [3000, 4000], "height": 2700,
+                   "exterior": False, "bearing": False}]})
+    errs = [i.code for i in run(p).issues if i.severity == "error"]
+    assert errs == ["V-069"]

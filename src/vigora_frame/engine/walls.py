@@ -412,6 +412,9 @@ def _frame_panel(wf: WallFrame, ctx: Ctx, pi: int, xs: float, xe: float):
                             note=f"reforço de canto para {info.other}"))
     for tp, tw, oid in wf.tees:
         if xs < tp < xe:
+            # encontro em T sobre abertura (V-069): sem bloco, para não gerar interferências em cascata
+            if any(of.zone_l - t < tp + tw / 2 and of.zone_r + t > tp - tw / 2 for of in wf.openings):
+                continue
             n = math.ceil((tw + 50) / t - 1e-9)        # bloco contínuo: 25 mm de apoio de cada lado
             x0b = tp - n * t / 2
             for k in range(n):

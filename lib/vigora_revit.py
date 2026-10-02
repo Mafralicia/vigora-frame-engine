@@ -237,6 +237,8 @@ def _caixa(doc, fi):
         return None
     if not any(k in fam for k in TANK_FAMILY_KEYS) or fi.Location is None or not hasattr(fi.Location, "Point"):
         return None
+    if getattr(fi, "SuperComponent", None) is not None:      # sub-componente aninhado da mesma família
+        return None
     modelo = None
     p = fi.Symbol.LookupParameter("Modelo") or fi.LookupParameter("Modelo")
     if p is not None and p.HasValue:
